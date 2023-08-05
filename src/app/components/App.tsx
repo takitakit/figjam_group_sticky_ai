@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/ui.css';
+import '../styles/ui.scss';
 import { Config } from "./Config"
 
 function App() {
