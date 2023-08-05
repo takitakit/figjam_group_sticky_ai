@@ -1,47 +1,40 @@
-import React from 'react';
-import '../styles/ui.scss';
-import { Config } from "./Config"
+import React from 'react'
+import '../styles/global.scss'
+
+import { Box, IconButton } from "@mui/material";
+import SettingsIcon from '@mui/icons-material/Settings'
+import { Config } from './Config'
 
 function App() {
-  const textbox = React.useRef<HTMLInputElement>(undefined);
+  const [page, setPage] = React.useState('main')
 
-  const countRef = React.useCallback((element: HTMLInputElement) => {
-    if (element) element.value = '5';
-    textbox.current = element;
-  }, []);
+  const handleConfigClick = () => {
+    setPage('config')
+  }
 
-  const onCreate = () => {
-    const count = parseInt(textbox.current.value, 10);
-    parent.postMessage({ pluginMessage: { type: 'create-rectangles', count } }, '*');
-  };
-
-  const onCancel = () => {
-    parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
-  };
+  const handleConfigClosed = () => {
+    setPage('main')
+  }
 
   React.useEffect(() => {
-    // This is how we read messages sent from the plugin controller
-    window.onmessage = (event) => {
-      const { type, message } = event.data.pluginMessage;
-      if (type === 'create-rectangles') {
-        console.log(`Figma Says: ${message}`);
-      }
-    };
+
   }, []);
 
   return (
-    <div>
-      <Config />
-      <h2>Rectangle Creator</h2>
-      <p>
-        Count: <input ref={countRef} />
-      </p>
-      <button id="create" onClick={onCreate}>
-        Create
-      </button>
-      <button onClick={onCancel}>Cancel</button>
-    </div>
+    <>
+      {
+        page !== 'config' &&
+          <Box position="absolute" top="0" right="0">
+            <IconButton onClick={handleConfigClick}>
+              <SettingsIcon />
+            </IconButton>
+          </Box>
+      }
+      {
+        page === 'config' && <Config onClosed={handleConfigClosed}/>
+      }
+    </>
   );
 }
 
-export default App;
+export default App
