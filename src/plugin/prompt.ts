@@ -1,4 +1,4 @@
-const prompt_ja = `特定のテーマにおける議論で、参加者から出された複数のアイデアについて、似た観点をもつものをグルーピングしてください。
+const prompt_ja = `特定のテーマにおける議論で、参加者から出された複数のアイデアについて、似た内容持つものをグルーピングしてください。
 一つずつのアイデアの先頭にはIDが付与されており、グルーピングの結果としては、観点とともに該当するアイデアのIDを列挙してください。
 結果は ## 結果フォーマット 内に記載のフォーマットに従ってください。
 結果に含まれるテキストは日本語で記載してください。
@@ -6,6 +6,7 @@ const prompt_ja = `特定のテーマにおける議論で、参加者から出�
 結果に含むアイデアIDはにカンマ区切りで記述し、全て一行で記載してください。
 実際のグルーピングの対象となるアイデアは、## アイデア入力 というテキストのあとに列挙しているので、
 中身を分析してグルーピングを行なってください。
+ただし、必ず ## アイデア入力 で指定したIDがすべて結果の中に含まれ、かつ数が一致するようにしてください。重複は許可しません。
 
 アイデアの例は ## アイデアの例 に、結果の出力のサンプルを ## アイデアの例に対しての結果出力例 にそれぞれ記載していますので参考にしてください。
 
@@ -73,6 +74,7 @@ Text included in the results should be written in English.
 Idea IDs to be included in the results should be separated by commas and all should be listed on a single line.
 The ideas for the actual grouping are listed after the text ## Idea Entry,
 Please analyze the content and grouping.
+However, be sure that all IDs specified in the ## Idea Entry are included in the results and that the numbers match. Duplicates are not allowed.
 
 Please refer to ## Idea Examples for examples of ideas and ## Sample Result Outputs for Idea Examples for reference.
 

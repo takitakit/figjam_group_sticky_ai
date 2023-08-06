@@ -1,8 +1,9 @@
 import { StickyNodeMap, Config } from './default.d'
 import { groupIdeas } from './groupIdeas'
 import { rearrangeStickyNodes } from './rearrangeStickyNodes'
+import { PluginError } from './PluginError'
 
-figma.showUI(__html__, { width: 300, height: 300 })
+figma.showUI(__html__, { width: 300, height: 330 })
 
 figma.ui.onmessage = msg => {
   console.log(`${msg.type} message received`)
@@ -76,8 +77,18 @@ function main() {
         Object.keys(stickyNodeMap).length !== resultNum &&
         !CONFIG.forcedContinuation
       ) {
+        const debug = []
+        res.map(idea => {
+          debug.push(...idea.ideaIDs)
+        })
+        console.log('debug', debug)
+
         // The number of selected stickies differs from the number of stickies in the analysis results.
-        throw new Error('plugin.error.discrepancyStickyNumber')
+        // throw new Error('plugin.error.discrepancyStickyNumber')
+        throw new PluginError(
+          'plugin.error.discrepancyStickyNumber',
+          `selected: ${Object.keys(stickyNodeMap).length} result: ${resultNum}`,
+        )
       }
 
       return rearrangeStickyNodes(stickyNodeMap, res)

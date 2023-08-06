@@ -5,9 +5,9 @@ export default {
     apiKeyLabel: 'ChatGTP-4 API Key',
     apiKeyHelper: 'API Key for ChatGPT-4 to analyze contents of stickies',
     forcedContinuationLabel:
-      'Continues processing even if analysis results are interrupted',
+      'Continue processing as much as possible even if results are incomplete',
     forcedContinuationTip:
-      "Depending on the number of selected stickies (amount of text), ChatGPT's API sending and receiving limits may be exceeded. In that case, you will receive partially trunked and incomplete results.",
+      "Depending on the number of selected fusions (amount of text) and the content, ChatGPT's API send/receive limit may cause the text to be trunked or the results to be unstable. We will sort as much as possible even under those conditions.",
     cancelButton: 'Cancel',
     saveButton: 'Save',
   },

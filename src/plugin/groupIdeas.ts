@@ -91,5 +91,31 @@ function parseGroups(input: string): GroupedIdea[] {
 
   console.log('groups', groups)
 
-  return groups
+  return removeDuplicateIDs(groups)
+}
+
+function removeDuplicateIDs(groups: GroupedIdea[]): GroupedIdea[] {
+  // Set to store IDs confirmed so far
+  const seenIDs = new Set<string>()
+
+  // Create a new group array
+  const newGroups: GroupedIdea[] = []
+
+  for (const group of groups) {
+    // Filter for IDs in the current group that have not yet been confirmed
+    const uniqueIDs = group.ideaIDs.filter(id => !seenIDs.has(id))
+
+    // If uniqueIDs is not empty, add as a new group
+    if (uniqueIDs.length > 0) {
+      newGroups.push({
+        groupName: group.groupName,
+        ideaIDs: uniqueIDs,
+      })
+
+      // If uniqueIDs is not empty, add IDs contained in uniqueIDs as a new group to seenIDs
+      uniqueIDs.forEach(id => seenIDs.add(id))
+    }
+  }
+
+  return newGroups
 }

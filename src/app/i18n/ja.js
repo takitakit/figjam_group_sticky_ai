@@ -4,9 +4,9 @@ export default {
     language: '言語',
     apiKeyLabel: 'ChatGTP-4 API Key',
     apiKeyHelper: 'ふせんの内容を分析するためのChatGPT-4用APIキー',
-    forcedContinuationLabel: '分析結果が中断されても処理を継続',
+    forcedContinuationLabel: '分析結果が不完全でも極力処理を続行する',
     forcedContinuationTip:
-      '選択したふせんの数（テキスト量）によっては、ChatGPTのAPI送受信制限を超える場合があります。その場合、部分的に切り詰められた不完全な結果を受け取ることになります。',
+      '選択したふせんの数（テキスト量）や、内容によっては、ChatGPTのAPI送受信制限でテキストがトランクされていたり、結果が不安定になることがあります。その状態でもなるべく並び替えを行います。',
     cancelButton: 'キャンセル',
     saveButton: '保存',
   },

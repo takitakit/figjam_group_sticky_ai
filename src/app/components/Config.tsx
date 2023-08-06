@@ -55,7 +55,7 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
     sharedObject?.config?.apiKey,
   )
   const [forcedContinuation, setForcedContinuation] = React.useState(
-    sharedObject?.config?.forcedContinuation,
+    sharedObject?.config?.forcedContinuation ?? true,
   )
   const [language, setLanguage] = React.useState(
     sharedObject?.config?.language ?? 'en',
