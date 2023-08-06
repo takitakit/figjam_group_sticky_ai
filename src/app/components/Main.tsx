@@ -11,6 +11,8 @@ import {
 import SettingsIcon from '@mui/icons-material/Settings'
 import LoadingButton from '@mui/lab/LoadingButton'
 import SaveIcon from '@mui/icons-material/Save'
+import { useTranslation } from 'react-i18next'
+import i18n from 'i18next'
 
 interface Props {
   onEmptyConfig: () => void
@@ -24,6 +26,8 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
   const context = React.useContext(AppContext)
   const { sharedObject, setSharedObject } = context
   const [result, setResult] = React.useState<result | null>(null)
+
+  const { t } = useTranslation()
 
   React.useEffect(() => {
     console.log('main mounted')
@@ -44,6 +48,8 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
           config: data,
           isLoadingConfig: false,
         }))
+
+        i18n.changeLanguage(data.language)
 
         if (!data.apiKey) {
           // if apiKey is not set, open config
@@ -114,11 +120,11 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
                 variant="outlined"
                 startIcon={<SaveIcon />}
               >
-                Group selected stickies
+                {t('main.executeButton')}
               </LoadingButton>
             ) : (
               <Button variant="outlined" size="small" onClick={handleExecute}>
-                Group selected stickies
+                {t('main.executeButton')}
               </Button>
             )}
           </>

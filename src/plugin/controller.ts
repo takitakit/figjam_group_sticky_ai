@@ -1,6 +1,7 @@
 import { StickyNodeMap, Config } from './default.d'
 import { groupIdeas } from './groupIdeas'
 import { rearrangeStickyNodes } from './rearrangeStickyNodes'
+// import i18n from 'i18next'
 
 figma.showUI(__html__, { width: 300, height: 300 })
 
@@ -42,6 +43,8 @@ function main() {
         })
         return
       }
+      // i18n.changeLanguage(config.language)
+
       CONFIG = config
     })
     .then(() => {
@@ -52,6 +55,7 @@ function main() {
       console.log(`selectedNodes ${selectedNodes.length} stickies`)
       if (selectedNodes.length < 3) {
         throw new Error('Select 3 or more stickies')
+        // throw new Error(i18n.t('plugin.error.invalidSelection'))
       }
 
       // Extract text of selected StickyNode with ID

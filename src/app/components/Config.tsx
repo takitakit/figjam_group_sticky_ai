@@ -13,6 +13,8 @@ import {
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { AppContext } from './AppProvider'
+import { useTranslation } from 'react-i18next'
+import i18n from 'i18next'
 
 interface Props {
   children?: React.ReactNode
@@ -45,6 +47,8 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
   //     }
   //   };
   // }, []);
+
+  const { t } = useTranslation()
 
   const { sharedObject, setSharedObject } = React.useContext(AppContext)
   const [inputApiKey, setInputApiKey] = React.useState(
@@ -106,6 +110,8 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
     }
     setSharedObject(prev => ({ ...prev, config: newConfig }))
 
+    i18n.changeLanguage(language)
+
     parent.postMessage(
       { pluginMessage: { type: 'save-config', data: newConfig } },
       '*',
@@ -120,12 +126,12 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
 
   return (
     <div>
-      <h3>Configuration</h3>
+      <h3>{t('config.title')}</h3>
       <Stack direction="column" spacing={2} mt={2} justifyContent="center">
         <TextField
-          label="ChatGPT-4 API Key"
+          label={t('config.apiKeyLabel')}
           error={!inputApiKey}
-          helperText="API Key for ChatGPT-4 to analyze contents of stickies"
+          helperText={t('config.apiKeyHelper')}
           fullWidth
           variant="outlined"
           size="small"
@@ -133,9 +139,9 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
           onChange={handleApiKeyChange}
         />
         <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
-          <InputLabel id="demo-select-small-label">Language</InputLabel>
+          <InputLabel id="language-label">{t('config.language')}</InputLabel>
           <Select
-            labelId="demo-select-small-label"
+            labelId="language-label"
             value={language}
             label="Language"
             onChange={handleLanguageChange}
@@ -145,11 +151,11 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
             <MenuItem value="ja">日本語</MenuItem>
           </Select>
         </FormControl>
-        <Tooltip title="Depending on the number of selected stickies (amount of text), ChatGPT's API sending and receiving limits may be exceeded. In that case, you will receive partially trunked and incomplete results.">
+        <Tooltip title={t('config.forcedContinuationTip')}>
           <FormControlLabel
             control={<Switch checked={forcedContinuation} />}
             sx={{ ...formControlLabelStyle }}
-            label="Continues processing even if analysis results are interrupted"
+            label={t('config.forcedContinuationLabel')}
             onChange={handleForcedContinuationChange}
           />
         </Tooltip>
@@ -163,7 +169,7 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
           onClick={handleClose}
           startIcon={<CloseIcon />}
         >
-          Cancel
+          {t('config.cancelButton')}
         </Button>
         <Button
           variant="outlined"
@@ -171,7 +177,7 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
           disabled={!inputApiKey}
           onClick={handleSave}
         >
-          Save
+          {t('config.saveButton')}
         </Button>
       </Stack>
     </div>
