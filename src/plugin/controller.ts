@@ -1,73 +1,94 @@
-figma.showUI(__html__, { width: 300, height: 250 })
-// figma.closePlugin();
+import { StickyNodeMap } from './default.d'
+import { groupIdeas } from './groupIdeas'
+import { rearrangeStickyNodes } from './rearrangeStickyNodes'
 
-// figma.showUI(__html__);
+figma.showUI(__html__, { width: 300, height: 250 })
 
 figma.ui.onmessage = msg => {
   console.log(`${msg.type} message received`)
 
   if (msg.type === 'load-config') {
     // Send config to UI
-    figma.clientStorage.getAsync('API_KEY').then(apiKey => {
+    figma.clientStorage.getAsync('CONFIG').then(config => {
       figma.ui.postMessage({
         type: 'load-config-done',
-        data: { apiKey: apiKey ?? undefined },
+        data: config,
       })
     })
   } else if (msg.type === 'save-config') {
-    // save apikey to client storage
+    // Save apikey to client storage
     const config = msg.data
     console.log('config', config)
 
-    figma.clientStorage.setAsync('API_KEY', config.apiKey).then(() => {
+    figma.clientStorage.setAsync('CONFIG', config).then(() => {
       figma.ui.postMessage({ type: 'save-config-done' })
     })
   } else if (msg.type === 'execute') {
-    figma.clientStorage
-      .getAsync('API_KEY')
-      .then(apiKey => {
-        if (!apiKey) {
-          figma.ui.postMessage({
-            type: 'execute-error',
-            data: { message: 'API Key is not set' },
-          })
-          return
-        }
-      })
-      .then(() => {
-        // check if sticky node is selected
-        const selected = figma.currentPage.selection.filter(
-          node => node.type === 'STICKY',
-        )
-        console.log(`selected ${selected.length} stickies`)
-        if (selected.length < 3) {
-          figma.ui.postMessage({
-            type: 'execute-error',
-            data: { message: 'Select 3 or more stickies' },
-          })
-          return
-        }
-      })
+    main()
   }
-  // if (msg.type === 'create-rectangles') {
-  //   const nodes = [];
+}
 
-  //   for (let i = 0; i < msg.count; i++) {
-  //     const rect = figma.createRectangle();
-  //     rect.x = i * 150;
-  //     rect.fills = [{ type: 'SOLID', color: { r: 1, g: 0.5, b: 0 } }];
-  //     figma.currentPage.appendChild(rect);
-  //     nodes.push(rect);
-  //   }
+function main() {
+  let API_KEY = ''
+  const stickyNodeMap: StickyNodeMap = {}
 
-  //   figma.currentPage.selection = nodes;
-  //   figma.viewport.scrollAndZoomIntoView(nodes);
+  figma.clientStorage
+    .getAsync('CONFIG')
+    .then(config => {
+      if (!config?.apiKey) {
+        figma.ui.postMessage({
+          type: 'execute-error',
+          data: { message: 'API Key is not set' },
+        })
+        return
+      }
+      API_KEY = config.apiKey
+    })
+    .then(() => {
+      // Check if sticky node is selected
+      const selectedNodes = figma.currentPage.selection.filter(
+        (node): node is StickyNode => node.type === 'STICKY',
+      )
+      console.log(`selectedNodes ${selectedNodes.length} stickies`)
+      if (selectedNodes.length < 3) {
+        throw new Error('Select 3 or more stickies')
+      }
 
-  //   // This is how figma responds back to the ui
-  //   figma.ui.postMessage({
-  //     type: 'create-rectangles',
-  //     message: `Created ${msg.count} Rectangles`,
-  //   });
+      // Extract text of selected StickyNode with ID
+      return selectedNodes.map((node, index) => {
+        const id = index + 1
+        stickyNodeMap[id] = node
 
-  // figma.closePlugin();
+        let text = node.text.characters ?? ''
+        text = text.replace(/\n/g, ' ')
+
+        return `${id}. ${text}`
+      })
+    })
+    .then(idea => {
+      return groupIdeas(idea, API_KEY)
+    })
+    .then(res => {
+      let resultNum = res.reduce((acc, idea) => acc + idea.ideaIDs.length, 0)
+      if (Object.keys(stickyNodeMap).length !== resultNum) {
+        // The number of selected stickies differs from the number of stickies in the analysis results.
+        throw new Error(
+          'The number of selected stickies differs from the number of stickies in the analysis result. There is a problem with the analysis result.',
+        )
+      }
+
+      return rearrangeStickyNodes(stickyNodeMap, res)
+    })
+    .then(() => {
+      figma.ui.postMessage({
+        type: 'execute-done',
+        data: { numberOfStickies: Object.keys(stickyNodeMap).length },
+      })
+    })
+    .catch(err => {
+      figma.ui.postMessage({
+        type: 'execute-error',
+        data: { message: err.message },
+      })
+    })
 }

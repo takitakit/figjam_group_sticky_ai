@@ -2,6 +2,7 @@ import React from 'react'
 
 interface Config {
   apiKey: string
+  forcedContinuation: boolean
 }
 
 interface SharedObject {
@@ -27,6 +28,7 @@ export const AppProvider: React.FC<ComponentProps> = ({ children }) => {
   const [sharedObject, setSharedObject] = React.useState<SharedObject>({
     config: {
       apiKey: '',
+      forcedContinuation: false,
     },
     isAppExecuting: false,
     isLoadingConfig: true,

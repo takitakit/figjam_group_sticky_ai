@@ -16,9 +16,14 @@ interface Props {
   onEmptyConfig: () => void
 }
 
+interface result {
+  numberOfStickies: number
+}
+
 export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
   const context = React.useContext(AppContext)
   const { sharedObject, setSharedObject } = context
+  const [result, setResult] = React.useState<result | null>(null)
 
   React.useEffect(() => {
     console.log('main mounted')
@@ -46,10 +51,19 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
         }
       } else if (type === 'execute-error') {
         // detect error
+        setResult(null)
         setSharedObject(prev => ({
           ...prev,
           isAppExecuting: false,
           executeError: data.message,
+        }))
+      } else if (type === 'execute-done') {
+        // detect success
+        setResult(data)
+        setSharedObject(prev => ({
+          ...prev,
+          isAppExecuting: false,
+          executeError: '',
         }))
       }
     }
@@ -61,6 +75,7 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
 
   const handleExecute = () => {
     // do group selected stickies
+    setResult(null)
     setSharedObject(prev => ({
       ...prev,
       isAppExecuting: true,
@@ -112,6 +127,13 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
       {sharedObject.executeError && (
         <Stack mt={2} spacing={2}>
           <Alert severity="error">{sharedObject.executeError}</Alert>
+        </Stack>
+      )}
+      {result && (
+        <Stack mt={2} spacing={2}>
+          <Alert severity="success">
+            Grouping of {result.numberOfStickies} stickies is completed
+          </Alert>
         </Stack>
       )}
     </div>

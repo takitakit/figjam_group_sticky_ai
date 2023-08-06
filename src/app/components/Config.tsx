@@ -1,5 +1,12 @@
 import React from 'react'
-import { TextField, Button, Stack } from '@mui/material'
+import {
+  TextField,
+  Button,
+  Stack,
+  Tooltip,
+  FormControlLabel,
+  Switch,
+} from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { AppContext } from './AppProvider'
 
@@ -39,6 +46,9 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
   const [inputApiKey, setInputApiKey] = React.useState(
     sharedObject?.config?.apiKey,
   )
+  const [forcedContinuation, setForcedContinuation] = React.useState(
+    sharedObject?.config?.forcedContinuation,
+  )
 
   React.useEffect(() => {
     console.log('config mounted')
@@ -59,6 +69,11 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
   const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputApiKey(event.target.value)
   }
+  const handleForcedContinuationChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setForcedContinuation(event.target.checked)
+  }
 
   const handleClose = () => {
     onClosed()
@@ -66,28 +81,54 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
 
   const handleSave = () => {
     // save config to plugin
-    console.log('inputApiKey', inputApiKey)
-    setSharedObject(prev => ({ ...prev, config: { apiKey: inputApiKey } }))
+    console.log(
+      'inputApiKey',
+      inputApiKey,
+      'forcedContinuation',
+      forcedContinuation,
+    )
+    const newConfig = {
+      apiKey: inputApiKey,
+      forcedContinuation: forcedContinuation,
+    }
+    setSharedObject(prev => ({ ...prev, config: newConfig }))
 
     parent.postMessage(
-      { pluginMessage: { type: 'save-config', data: { apiKey: inputApiKey } } },
+      { pluginMessage: { type: 'save-config', data: newConfig } },
       '*',
     )
+  }
+
+  const formControlLabelStyle = {
+    '& .MuiFormControlLabel-label': {
+      fontSize: '.8rem',
+    },
   }
 
   return (
     <div>
       <h3>Configuration</h3>
-      <TextField
-        label="ChatGPT-4 API Key"
-        error={!inputApiKey}
-        helperText="API Key for ChatGPT-4 to analyze contents of stickies"
-        fullWidth
-        variant="outlined"
-        size="small"
-        value={inputApiKey}
-        onChange={handleApiKeyChange}
-      />
+      <Stack direction="column" spacing={2} mt={2} justifyContent="center">
+        <TextField
+          label="ChatGPT-4 API Key"
+          error={!inputApiKey}
+          helperText="API Key for ChatGPT-4 to analyze contents of stickies"
+          fullWidth
+          variant="outlined"
+          size="small"
+          value={inputApiKey}
+          onChange={handleApiKeyChange}
+        />
+        <Tooltip title="Depending on the number of selected stickies (amount of text), ChatGPT's API sending and receiving limits may be exceeded. In that case, you will receive partially trunked and incomplete results.">
+          <FormControlLabel
+            control={<Switch checked={forcedContinuation} />}
+            sx={{ ...formControlLabelStyle }}
+            label="Continues processing even if analysis results are interrupted"
+            onChange={handleForcedContinuationChange}
+          />
+        </Tooltip>
+      </Stack>
+
       <Stack direction="row" spacing={2} mt={2} justifyContent="center">
         <Button
           variant="outlined"
@@ -98,7 +139,12 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
         >
           Cancel
         </Button>
-        <Button variant="outlined" size="small" onClick={handleSave}>
+        <Button
+          variant="outlined"
+          size="small"
+          disabled={!inputApiKey}
+          onClick={handleSave}
+        >
           Save
         </Button>
       </Stack>
