@@ -41,6 +41,18 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
 
   const [apiKey, setApiKey] = React.useState(sharedConfig.apiKey)
 
+  React.useEffect(() => {
+    console.log('config mounted')
+
+    window.onmessage = (event: MessageEvent) => {
+      const { type } = event.data.pluginMessage
+      console.log(`${type} message received`)
+      if (type === 'save-config-done') {
+        onClosed()
+      }
+    }
+  }, [])
+
   const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setApiKey(event.target.value)
   }
@@ -50,7 +62,11 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
   }
 
   const handleSave = () => {
-    console.log(apiKey)
+    // save config to plugin
+    parent.postMessage(
+      { pluginMessage: { type: 'save-config', data: { apiKey } } },
+      '*',
+    )
   }
 
   return (
@@ -58,6 +74,7 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
       <h3>Configuration</h3>
       <TextField
         label="ChatGPT-4 API Key"
+        error={!apiKey}
         helperText="API Key for ChatGPT-4 to analyze contents of stickies"
         fullWidth
         variant="outlined"

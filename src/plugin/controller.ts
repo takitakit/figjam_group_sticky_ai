@@ -4,15 +4,23 @@ figma.showUI(__html__)
 // figma.showUI(__html__);
 
 figma.ui.onmessage = msg => {
-  if (msg.type === 'load-config') {
-    console.log('load-config message received')
+  console.log(`${msg.type} message received`)
 
+  if (msg.type === 'load-config') {
     // Send config to UI
     figma.clientStorage.getAsync('API_KEY').then(apiKey => {
       figma.ui.postMessage({
-        type: 'send-config',
+        type: 'load-config-done',
         data: { apiKey: apiKey ?? undefined },
       })
+    })
+  } else if (msg.type === 'save-config') {
+    // PluginDataにAPI_KEYを保存
+    const config = msg.data
+    console.log('config', config)
+
+    figma.clientStorage.setAsync('API_KEY', config.apiKey).then(() => {
+      figma.ui.postMessage({ type: 'save-config-done' })
     })
   }
   // if (msg.type === 'create-rectangles') {

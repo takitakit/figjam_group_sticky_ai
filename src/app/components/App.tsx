@@ -18,6 +18,12 @@ function App() {
     setPage('main')
   }
 
+  const handleEmptyConfig = () => {
+    console.log('empty config detected')
+    // if config is empty, open config
+    setPage('config')
+  }
+
   return (
     <>
       <AppProvider>
@@ -28,7 +34,7 @@ function App() {
             </IconButton>
           </Box>
         )}
-        {page === 'main' && <Main />}
+        {page === 'main' && <Main onEmptyConfig={handleEmptyConfig} />}
         {page === 'config' && <Config onClosed={handleConfigClosed} />}
       </AppProvider>
     </>
