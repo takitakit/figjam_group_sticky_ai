@@ -17,7 +17,8 @@ export default {
   },
   plugin: {
     error: {
-      invalidSelection: '3 or more stickies must be selected',
+      invalidSelection:
+        'You must select at least 3 and no more than 100 stickies',
       discrepancyStickyNumber:
         'The number of selected stickies differs from the number of stickies in the analysis result. There is a problem with the analysis result.',
       apiStatusError: 'Error occurred during API request. status:',
