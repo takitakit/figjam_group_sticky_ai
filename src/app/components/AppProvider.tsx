@@ -4,24 +4,38 @@ interface Config {
   apiKey: string
 }
 
+interface SharedObject {
+  config: Config
+  isAppExecuting: boolean
+  isLoadingConfig: boolean
+  executeError: string
+  currentPage: 'main' | 'config'
+}
+
 interface ComponentProps {
   children?: React.ReactNode
 }
 
 interface Context {
-  sharedConfig: Config
-  setSharedConfig: React.Dispatch<React.SetStateAction<Config>>
+  sharedObject: SharedObject
+  setSharedObject: React.Dispatch<React.SetStateAction<SharedObject>>
 }
 
 export const AppContext = React.createContext<Context | undefined>(undefined)
 
 export const AppProvider: React.FC<ComponentProps> = ({ children }) => {
-  const [sharedConfig, setSharedConfig] = React.useState<Config>({
-    apiKey: '',
+  const [sharedObject, setSharedObject] = React.useState<SharedObject>({
+    config: {
+      apiKey: '',
+    },
+    isAppExecuting: false,
+    isLoadingConfig: true,
+    executeError: '',
+    currentPage: 'main',
   })
 
   return (
-    <AppContext.Provider value={{ sharedConfig, setSharedConfig }}>
+    <AppContext.Provider value={{ sharedObject, setSharedObject }}>
       {children}
     </AppContext.Provider>
   )

@@ -35,11 +35,10 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
   //   };
   // }, []);
 
-  React.useEffect(() => {}, [])
-
-  const { sharedConfig } = React.useContext(AppContext)
-
-  const [apiKey, setApiKey] = React.useState(sharedConfig.apiKey)
+  const { sharedObject, setSharedObject } = React.useContext(AppContext)
+  const [inputApiKey, setInputApiKey] = React.useState(
+    sharedObject?.config?.apiKey,
+  )
 
   React.useEffect(() => {
     console.log('config mounted')
@@ -51,10 +50,14 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
         onClosed()
       }
     }
+
+    return () => {
+      window.onmessage = null
+    }
   }, [])
 
   const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setApiKey(event.target.value)
+    setInputApiKey(event.target.value)
   }
 
   const handleClose = () => {
@@ -63,8 +66,11 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
 
   const handleSave = () => {
     // save config to plugin
+    console.log('inputApiKey', inputApiKey)
+    setSharedObject(prev => ({ ...prev, config: { apiKey: inputApiKey } }))
+
     parent.postMessage(
-      { pluginMessage: { type: 'save-config', data: { apiKey } } },
+      { pluginMessage: { type: 'save-config', data: { apiKey: inputApiKey } } },
       '*',
     )
   }
@@ -74,12 +80,12 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
       <h3>Configuration</h3>
       <TextField
         label="ChatGPT-4 API Key"
-        error={!apiKey}
+        error={!inputApiKey}
         helperText="API Key for ChatGPT-4 to analyze contents of stickies"
         fullWidth
         variant="outlined"
         size="small"
-        value={apiKey}
+        value={inputApiKey}
         onChange={handleApiKeyChange}
       />
       <Stack direction="row" spacing={2} mt={2} justifyContent="center">

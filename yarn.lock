@@ -1214,7 +1214,7 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.46.0.tgz#3f7802972e8b6fe3f88ed1aabc74ec596c456db6"
   integrity sha512-a8TLtmPi8xzPkCbp/OGFUo5yhRkHM2Ko9kOWP4znJr0WAhWyThaw3PnwX4vOTWOAMsV2uRt32PPDcEz63esSaA==
 
-"@figma/plugin-typings@^1.50.0":
+"@figma/plugin-typings@*":
   version "1.72.0"
   resolved "https://registry.yarnpkg.com/@figma/plugin-typings/-/plugin-typings-1.72.0.tgz#a6cba4940e324d8842a5b9455e576ddda0335fbd"
   integrity sha512-SRW8qQOLf/QOtgP7OsUfw4oD6Z+tbenLR2PgNXGSh2SJohcnucIEEc7An5Wd5qTl35xfC4TmZE0YpTGMknVpgw==
@@ -1313,6 +1313,20 @@
   integrity sha512-XkxWPhageu1OPUm2LWjo5XqeQ0t2xfGe8EiLkRW9oz2LHMMZmijvCxulhgquUVTF1DnoSh+3KoDLSsoAFtVNVw==
   dependencies:
     "@babel/runtime" "^7.22.6"
+
+"@mui/lab@^5.0.0-alpha.138":
+  version "5.0.0-alpha.138"
+  resolved "https://registry.yarnpkg.com/@mui/lab/-/lab-5.0.0-alpha.138.tgz#bc3a11f57f1ee607553e07a45016758a515d04df"
+  integrity sha512-xlvKej3ox0U8BNl01Sobvz3lxySeH/ZY8lFIxzvMP6de0rFLEUePF+QxX8PN6tMARBfCV5nsqn7Bfnop/NZuEg==
+  dependencies:
+    "@babel/runtime" "^7.22.6"
+    "@mui/base" "5.0.0-beta.9"
+    "@mui/system" "^5.14.3"
+    "@mui/types" "^7.2.4"
+    "@mui/utils" "^5.14.3"
+    clsx "^2.0.0"
+    prop-types "^15.8.1"
+    react-is "^18.2.0"
 
 "@mui/material@^5.14.3":
   version "5.14.3"
