@@ -1,4 +1,4 @@
-import { StickyNodeMap } from './default.d'
+import { StickyNodeMap, Config } from './default.d'
 import { groupIdeas } from './groupIdeas'
 import { rearrangeStickyNodes } from './rearrangeStickyNodes'
 
@@ -29,7 +29,7 @@ figma.ui.onmessage = msg => {
 }
 
 function main() {
-  let API_KEY = ''
+  let CONFIG: Config
   const stickyNodeMap: StickyNodeMap = {}
 
   figma.clientStorage
@@ -42,7 +42,7 @@ function main() {
         })
         return
       }
-      API_KEY = config.apiKey
+      CONFIG = config
     })
     .then(() => {
       // Check if sticky node is selected
@@ -66,11 +66,15 @@ function main() {
       })
     })
     .then(idea => {
-      return groupIdeas(idea, API_KEY)
+      return groupIdeas(idea, CONFIG)
     })
     .then(res => {
+      console.log('CONFIG', CONFIG)
       let resultNum = res.reduce((acc, idea) => acc + idea.ideaIDs.length, 0)
-      if (Object.keys(stickyNodeMap).length !== resultNum) {
+      if (
+        Object.keys(stickyNodeMap).length !== resultNum &&
+        !CONFIG.forcedContinuation
+      ) {
         // The number of selected stickies differs from the number of stickies in the analysis results.
         throw new Error(
           'The number of selected stickies differs from the number of stickies in the analysis result. There is a problem with the analysis result.',

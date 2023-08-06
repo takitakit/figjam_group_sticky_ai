@@ -12,3 +12,7 @@ export type GroupedIdea = {
   ideaIDs: string[]
 }
 
+export type Config = {
+  apiKey: string
+  forcedContinuation: boolean
+}

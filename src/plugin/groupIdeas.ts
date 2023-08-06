@@ -1,10 +1,10 @@
 import promptTemplate from './prompt'
-import { GroupedIdea } from './default.d'
+import { GroupedIdea, Config } from './default.d'
 
 // group ideas using ChatGPT
 export async function groupIdeas(
   idea: string[],
-  apiKey: string,
+  config: Config,
 ): Promise<GroupedIdea[]> {
   console.log('groupIdeas')
 
@@ -15,7 +15,7 @@ export async function groupIdeas(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${config.apiKey}`,
     },
     body: JSON.stringify({
       model: 'gpt-4',
