@@ -52,8 +52,11 @@ function main() {
         (node): node is StickyNode => node.type === 'STICKY',
       )
       console.log(`selectedNodes ${selectedNodes.length} stickies`)
-      if (selectedNodes.length < 3) {
-        throw new Error('plugin.error.invalidSelection')
+      if (selectedNodes.length < 3 || selectedNodes.length > 50) {
+        throw new PluginError(
+          'plugin.error.invalidSelection',
+          `selected: ${selectedNodes.length}`,
+        )
       }
 
       // Extract text of selected StickyNode with ID
