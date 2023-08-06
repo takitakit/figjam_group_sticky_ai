@@ -4,8 +4,12 @@ import {
   Button,
   Stack,
   Tooltip,
+  FormControl,
   FormControlLabel,
+  InputLabel,
   Switch,
+  Select,
+  MenuItem,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { AppContext } from './AppProvider'
@@ -49,6 +53,9 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
   const [forcedContinuation, setForcedContinuation] = React.useState(
     sharedObject?.config?.forcedContinuation,
   )
+  const [language, setLanguage] = React.useState(
+    sharedObject?.config?.language ?? 'en',
+  )
 
   React.useEffect(() => {
     console.log('config mounted')
@@ -74,6 +81,9 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
   ) => {
     setForcedContinuation(event.target.checked)
   }
+  const handleLanguageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLanguage(event.target.value as 'en' | 'ja')
+  }
 
   const handleClose = () => {
     onClosed()
@@ -86,10 +96,13 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
       inputApiKey,
       'forcedContinuation',
       forcedContinuation,
+      'language',
+      language,
     )
     const newConfig = {
       apiKey: inputApiKey,
-      forcedContinuation: forcedContinuation,
+      forcedContinuation,
+      language,
     }
     setSharedObject(prev => ({ ...prev, config: newConfig }))
 
@@ -119,6 +132,19 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
           value={inputApiKey}
           onChange={handleApiKeyChange}
         />
+        <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+          <InputLabel id="demo-select-small-label">Language</InputLabel>
+          <Select
+            labelId="demo-select-small-label"
+            value={language}
+            label="Language"
+            onChange={handleLanguageChange}
+            size="small"
+          >
+            <MenuItem value="en">English</MenuItem>
+            <MenuItem value="ja">日本語</MenuItem>
+          </Select>
+        </FormControl>
         <Tooltip title="Depending on the number of selected stickies (amount of text), ChatGPT's API sending and receiving limits may be exceeded. In that case, you will receive partially trunked and incomplete results.">
           <FormControlLabel
             control={<Switch checked={forcedContinuation} />}

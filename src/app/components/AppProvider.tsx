@@ -3,6 +3,7 @@ import React from 'react'
 interface Config {
   apiKey: string
   forcedContinuation: boolean
+  language: 'en' | 'ja'
 }
 
 interface SharedObject {
@@ -29,6 +30,7 @@ export const AppProvider: React.FC<ComponentProps> = ({ children }) => {
     config: {
       apiKey: '',
       forcedContinuation: false,
+      language: 'en',
     },
     isAppExecuting: false,
     isLoadingConfig: true,

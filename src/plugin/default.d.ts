@@ -15,4 +15,5 @@ export type GroupedIdea = {
 export type Config = {
   apiKey: string
   forcedContinuation: boolean
+  language: 'en' | 'ja'
 }

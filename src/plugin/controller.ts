@@ -2,7 +2,7 @@ import { StickyNodeMap, Config } from './default.d'
 import { groupIdeas } from './groupIdeas'
 import { rearrangeStickyNodes } from './rearrangeStickyNodes'
 
-figma.showUI(__html__, { width: 300, height: 250 })
+figma.showUI(__html__, { width: 300, height: 300 })
 
 figma.ui.onmessage = msg => {
   console.log(`${msg.type} message received`)
