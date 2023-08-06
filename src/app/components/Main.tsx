@@ -1,10 +1,10 @@
-import React from 'react';
-import { AppContext } from './AppProvider';
+import React from 'react'
+import { AppContext } from './AppProvider'
 
-export const Main:React.FC = () => {
+export const Main: React.FC = () => {
   const context = React.useContext(AppContext)
 
-  const { setSharedConfig } = context;
+  const { setSharedConfig } = context
 
   React.useEffect(() => {
     console.log('main mounted')
@@ -12,14 +12,13 @@ export const Main:React.FC = () => {
     parent.postMessage({ pluginMessage: { type: 'load-config' } }, '*')
 
     window.onmessage = (event: MessageEvent) => {
-      const { type, data } = event.data.pluginMessage;
+      const { type, data } = event.data.pluginMessage
       if (type === 'send-config') {
         console.log('config received', data)
         setSharedConfig(data)
       }
-    };
-  }, []);
-
+    }
+  }, [])
 
   return (
     <div>

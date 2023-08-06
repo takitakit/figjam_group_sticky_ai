@@ -1,15 +1,18 @@
-figma.showUI(__html__);
+figma.showUI(__html__)
 // figma.closePlugin();
 
 // figma.showUI(__html__);
 
-figma.ui.onmessage = (msg) => {
+figma.ui.onmessage = msg => {
   if (msg.type === 'load-config') {
     console.log('load-config message received')
 
     // Send config to UI
-    figma.clientStorage.getAsync('API_KEY').then((apiKey) => {
-      figma.ui.postMessage({ type: 'send-config', data: { apiKey: apiKey ?? undefined } })
+    figma.clientStorage.getAsync('API_KEY').then(apiKey => {
+      figma.ui.postMessage({
+        type: 'send-config',
+        data: { apiKey: apiKey ?? undefined },
+      })
     })
   }
   // if (msg.type === 'create-rectangles') {
@@ -32,6 +35,5 @@ figma.ui.onmessage = (msg) => {
   //     message: `Created ${msg.count} Rectangles`,
   //   });
 
-
   // figma.closePlugin();
-};
+}

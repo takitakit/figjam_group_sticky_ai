@@ -1,15 +1,14 @@
-import React from "react"
-import { TextField, Button, Stack } from '@mui/material';
+import React from 'react'
+import { TextField, Button, Stack } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { AppContext } from './AppProvider';
+import { AppContext } from './AppProvider'
 
 interface Props {
-  children?: React.ReactNode;
-  onClosed?: () => void;
+  children?: React.ReactNode
+  onClosed?: () => void
 }
 
-export const Config:React.FC<Props> = ({ onClosed }) => {
-
+export const Config: React.FC<Props> = ({ onClosed }) => {
   // const textbox = React.useRef<HTMLInputElement>(undefined);
 
   // const countRef = React.useCallback((element: HTMLInputElement) => {
@@ -36,13 +35,10 @@ export const Config:React.FC<Props> = ({ onClosed }) => {
   //   };
   // }, []);
 
+  React.useEffect(() => {}, [])
 
-  React.useEffect(() => {
+  const { sharedConfig } = React.useContext(AppContext)
 
-  }, [])
-
-  const { sharedConfig } = React.useContext(AppContext);
-  
   const [apiKey, setApiKey] = React.useState(sharedConfig.apiKey)
 
   const handleApiKeyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,10 +56,28 @@ export const Config:React.FC<Props> = ({ onClosed }) => {
   return (
     <div>
       <h3>Configuration</h3>
-      <TextField label="ChatGPT-4 API Key" helperText="API Key for ChatGPT-4 to analyze contents of stickies" fullWidth variant="outlined" size="small" value={apiKey} onChange={handleApiKeyChange} />
+      <TextField
+        label="ChatGPT-4 API Key"
+        helperText="API Key for ChatGPT-4 to analyze contents of stickies"
+        fullWidth
+        variant="outlined"
+        size="small"
+        value={apiKey}
+        onChange={handleApiKeyChange}
+      />
       <Stack direction="row" spacing={2} mt={2} justifyContent="center">
-        <Button variant="outlined" size="small" color="error" onClick={handleClose} startIcon={<CloseIcon />}>Cancel</Button>
-        <Button variant="outlined" size="small" onClick={handleSave}>Save</Button>
+        <Button
+          variant="outlined"
+          size="small"
+          color="error"
+          onClick={handleClose}
+          startIcon={<CloseIcon />}
+        >
+          Cancel
+        </Button>
+        <Button variant="outlined" size="small" onClick={handleSave}>
+          Save
+        </Button>
       </Stack>
     </div>
   )

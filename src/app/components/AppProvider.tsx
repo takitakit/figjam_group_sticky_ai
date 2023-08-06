@@ -5,7 +5,7 @@ interface Config {
 }
 
 interface ComponentProps {
-  children?: React.ReactNode;
+  children?: React.ReactNode
 }
 
 interface Context {
@@ -16,7 +16,9 @@ interface Context {
 export const AppContext = React.createContext<Context | undefined>(undefined)
 
 export const AppProvider: React.FC<ComponentProps> = ({ children }) => {
-  const [sharedConfig, setSharedConfig] = React.useState<Config>({apiKey: ''})
+  const [sharedConfig, setSharedConfig] = React.useState<Config>({
+    apiKey: '',
+  })
 
   return (
     <AppContext.Provider value={{ sharedConfig, setSharedConfig }}>
