@@ -9,7 +9,7 @@ export async function groupIdeas(
 ): Promise<GroupedIdea[]> {
   console.log('groupIdeas')
 
-  const prompt = promptTemplate + idea.join('\n')
+  const prompt = promptTemplate[config.language] + idea.join('\n')
   console.log('prompt', prompt)
 
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -59,7 +59,7 @@ export async function groupIdeas(
 function parseGroups(input: string): GroupedIdea[] {
   console.log('parseGroups')
 
-  if (input.trim().startsWith('エラー')) {
+  if (input.trim().startsWith('Error')) {
     throw new Error('plugin.error.apiResponseParseError')
   }
 

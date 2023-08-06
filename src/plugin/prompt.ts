@@ -1,6 +1,7 @@
-const prompt = `特定のテーマにおける議論で、参加者から出された複数のアイデアについて、似た観点をもつものをグルーピングしてください。
+const prompt_ja = `特定のテーマにおける議論で、参加者から出された複数のアイデアについて、似た観点をもつものをグルーピングしてください。
 一つずつのアイデアの先頭にはIDが付与されており、グルーピングの結果としては、観点とともに該当するアイデアのIDを列挙してください。
 結果は ## 結果フォーマット 内に記載のフォーマットに従ってください。
+結果に含まれるテキストは日本語で記載してください。
 
 結果に含むアイデアIDはにカンマ区切りで記述し、全て一行で記載してください。
 実際のグルーピングの対象となるアイデアは、## アイデア入力 というテキストのあとに列挙しているので、
@@ -9,7 +10,7 @@ const prompt = `特定のテーマにおける議論で、参加者から出さ�
 アイデアの例は ## アイデアの例 に、結果の出力のサンプルを ## アイデアの例に対しての結果出力例 にそれぞれ記載していますので参考にしてください。
 
 類似点が多いものをまとめて見やすくするためなので、類似点が少ない場合は無理にグルーピングしないでください。
-グルーピングが難しく、結果フォーマットに従って出力ができない場合は、「エラー」という文字列だけを出力してください。
+グルーピングが難しく、結果フォーマットに従って出力ができない場合は、「Error」という文字列だけを出力してください。
 
 ## 結果フォーマット
 group: <アイデアから抽出したグループ名>
@@ -64,4 +65,74 @@ ideaIDs: 4,5
 ## アイデア入力
 `
 
-export default prompt
+const prompt_en = `Please group multiple ideas that have similar perspectives that have been raised by the participants in a discussion on a particular topic.
+Each idea is prefixed with an ID, and the grouping result should list the ID of the corresponding idea along with the point of view.
+The results should follow the format described in ## Results Format.
+Text included in the results should be written in English.
+
+Idea IDs to be included in the results should be separated by commas and all should be listed on a single line.
+The ideas for the actual grouping are listed after the text ## Idea Entry,
+Please analyze the content and grouping.
+
+Please refer to ## Idea Examples for examples of ideas and ## Sample Result Outputs for Idea Examples for reference.
+
+If there are only a few similarities, please do not group them.
+If grouping is difficult and the results cannot be output according to the result format, please output only the string "Error".
+
+## Results format
+group: <name of group extracted from ideas>
+ideaIDs: <ID>,<ID>,<ID>
+
+## Idea Examples 1
+- 1. derivation: expected value of personal information deletion in DLP ChatGPT: I want to say that 99.9999999% of personal information can be deleted if both are multiplied together.
+- 2. new business proposalagent Expected value: It doesn't have to be a new business, but I have a feeling that LLM wants employees to touch Agents that are independent and repeat thinking (e.g. multiple Agents' dialogue).
+- 3. Derivation: Embeddings Similarity search of behavior logs (same recommendation for people doing the same behavior?) Expectation: May be possible to return to business?
+- 4. English complementation (like copilot) Expected value: Github Copilot is very comfortable, so it would be nice to be able to do the same with scouting messages, for example.
+- 5. You, who can keep the online chit-chat going and keep it lively.
+- 6. Preparation of meeting minutes (Transcription + GPT4) It would be good to have a transcription, and then use the Notion API to summarize the minutes using NotionAI.
+- 7. Embdding can be used to recommend lab app functions based on lab app behavior data.
+- 8. use generated AI for personal information masking (name, phone number, etc.) and detection
+
+## Sample Result Outputs for Idea Examples 1
+group: privacy and security
+ideaIDs: 1,8
+
+group: Interaction with AI agents
+ideaIDs: 2
+
+group: Data analysis and recommendation
+ideaIDs: 3,7
+
+group: Text generation and completion
+ideaIDs: 4
+
+group: Communication enhancement
+ideaIDs: 5
+
+group: Documentation and minutes
+ideaIDs: 6
+
+## Idea Examples 2
+- 1. I think it would be better to adapt the event app to the SaaS matching app before integrating it with the SaaS matching app, or to organize the many roles in the event app. 2.
+- 2. lack of application of the event app Concerns about the impact on app integration
+- 3. mobpro MTG, I believe the purpose was to engage interns, so maybe we should focus on that first?
+- 4. Since the implementation of the plugin has been done in a very crude manner in order to prioritize speed, it is necessary to consider how to maintain the source code of the SaaS matching app in the future. (5) The release of the plugin has taken a lot of time.
+- 5. I feel like I spent a lot of time coordinating with SaaS Matching App for the release of the plugin, etc.
+
+## Sample Result Outputs for Idea Examples 2
+group: event app functional reorganization/refactoring
+ideaIDs: 1,2
+
+group: MobPro MTG operations
+ideaIDs: 3
+
+group: improve efficiency of plugins
+ideaIDs: 4,5
+
+## Idea Entry
+`
+
+export default {
+  ja: prompt_ja,
+  en: prompt_en,
+}

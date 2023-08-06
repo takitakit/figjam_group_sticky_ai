@@ -49,9 +49,9 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
           isLoadingConfig: false,
         }))
 
-        i18n.changeLanguage(data.language)
+        i18n.changeLanguage(data?.language || 'en')
 
-        if (!data.apiKey) {
+        if (!data?.apiKey) {
           // if apiKey is not set, open config
           onEmptyConfig()
         }
