@@ -1,7 +1,6 @@
 import { StickyNodeMap, Config } from './default.d'
 import { groupIdeas } from './groupIdeas'
 import { rearrangeStickyNodes } from './rearrangeStickyNodes'
-// import i18n from 'i18next'
 
 figma.showUI(__html__, { width: 300, height: 300 })
 
@@ -43,7 +42,6 @@ function main() {
         })
         return
       }
-      // i18n.changeLanguage(config.language)
 
       CONFIG = config
     })
@@ -54,8 +52,7 @@ function main() {
       )
       console.log(`selectedNodes ${selectedNodes.length} stickies`)
       if (selectedNodes.length < 3) {
-        throw new Error('Select 3 or more stickies')
-        // throw new Error(i18n.t('plugin.error.invalidSelection'))
+        throw new Error('plugin.error.invalidSelection')
       }
 
       // Extract text of selected StickyNode with ID
@@ -80,9 +77,7 @@ function main() {
         !CONFIG.forcedContinuation
       ) {
         // The number of selected stickies differs from the number of stickies in the analysis results.
-        throw new Error(
-          'The number of selected stickies differs from the number of stickies in the analysis result. There is a problem with the analysis result.',
-        )
+        throw new Error('plugin.error.discrepancyStickyNumber')
       }
 
       return rearrangeStickyNodes(stickyNodeMap, res)
@@ -94,9 +89,14 @@ function main() {
       })
     })
     .catch(err => {
+      console.log('err', err)
+
       figma.ui.postMessage({
         type: 'execute-error',
-        data: { message: err.message },
+        data: {
+          message: err.message,
+          originalError: err.originalError,
+        },
       })
     })
 }

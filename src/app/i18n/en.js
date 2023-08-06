@@ -13,10 +13,16 @@ export default {
   },
   main: {
     executeButton: 'Group Selected Stickies',
+    executeResult: 'Grouping of {{numOfStickies}} stickies is completed',
   },
   plugin: {
     error: {
       invalidSelection: '3 or more stickies must be selected',
+      discrepancyStickyNumber:
+        'The number of selected stickies differs from the number of stickies in the analysis result. There is a problem with the analysis result.',
+      apiStatusError: 'Error occurred during API request. status:',
+      apiRequestError: 'API request failed. error:',
+      apiResponseParseError: 'Failed to parse API response',
     },
   },
 }

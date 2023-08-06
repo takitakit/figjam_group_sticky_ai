@@ -12,10 +12,16 @@ export default {
   },
   main: {
     executeButton: '選択されたふせんをグループ化する',
+    executeResult: '{{numOfStickies}}個のふせんをグループ化しました',
   },
   plugin: {
     error: {
       invalidSelection: '3つ以上のふせんを選択する必要があります',
+      discrepancyStickyNumber:
+        '選択されたふせんの数と、解析結果のふせんの数が異なります。解析結果に問題があります。',
+      apiStatusError: 'APIレスポンスに問題がありました。 status:',
+      apiRequestError: 'APIリクエスト中に問題がありました。 error:',
+      apiResponseParseError: 'APIレスポンスのパースに失敗しました。',
     },
   },
 }

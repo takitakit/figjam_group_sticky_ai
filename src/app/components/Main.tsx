@@ -57,11 +57,17 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
         }
       } else if (type === 'execute-error') {
         // detect error
+        console.log('data', data)
+        let message = t(data.message)
+        if (data.originalError) {
+          message = `${message} ${data.originalError}`
+        }
+
         setResult(null)
         setSharedObject(prev => ({
           ...prev,
           isAppExecuting: false,
-          executeError: data.message,
+          executeError: message,
         }))
       } else if (type === 'execute-done') {
         // detect success
@@ -138,7 +144,9 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
       {result && (
         <Stack mt={2} spacing={2}>
           <Alert severity="success">
-            Grouping of {result.numberOfStickies} stickies is completed
+            {t('main.executeResult', {
+              numOfStickies: result.numberOfStickies,
+            })}
           </Alert>
         </Stack>
       )}

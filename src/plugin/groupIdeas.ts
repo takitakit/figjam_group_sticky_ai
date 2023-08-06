@@ -1,5 +1,6 @@
 import promptTemplate from './prompt'
 import { GroupedIdea, Config } from './default.d'
+import { PluginError } from './PluginError'
 
 // group ideas using ChatGPT
 export async function groupIdeas(
@@ -33,16 +34,17 @@ export async function groupIdeas(
       stop: [' Human:', ' AI:'],
     }),
   })
+    .catch(error => {
+      throw new PluginError('plugin.error.apiRequestError', `${error.message}`)
+    })
     .then(response => {
       if (!response.ok) {
-        throw new Error(
-          `Error occurred during API request. status: ${response.status}`,
+        throw new PluginError(
+          'plugin.error.apiStatusError',
+          `${response.status}`,
         )
       }
       return response
-    })
-    .catch(error => {
-      throw new Error(`API request failed. error: ${error.message}`)
     })
 
   const data = await response.json()
@@ -58,7 +60,7 @@ function parseGroups(input: string): GroupedIdea[] {
   console.log('parseGroups')
 
   if (input.trim().startsWith('エラー')) {
-    throw new Error('Failed to parse API response')
+    throw new Error('plugin.error.apiResponseParseError')
   }
 
   const groups: GroupedIdea[] = []
