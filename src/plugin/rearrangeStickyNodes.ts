@@ -16,16 +16,10 @@ export async function rearrangeStickyNodes(
 
   const marginBetweenGroups = 100
 
-  type GroupPosMap = {
-    [key: number]: {
-      x: number
-      y: number
-    }
-  }
-  const groupPosMap: GroupPosMap = {}
+  const groupPosMap: { [key: number]: { x: number; y: number } } = {}
 
   let maxX = layoutRange.min.x
-  groupedIdeas.map((group, index) => {
+  groupedIdeas.forEach((group, index) => {
     console.log('group:', group.groupName)
 
     // グループごとに座標を記録
@@ -64,19 +58,19 @@ export async function rearrangeStickyNodes(
   })
 
   // グループ単位のグループ名テキストを配置
-  const promises = groupedIdeas.map(async (group, index) => {
-    const pos = groupPosMap[index]
+  await Promise.all(
+    groupedIdeas.map(async (group, index) => {
+      const pos = groupPosMap[index]
 
-    // グループのテキストを配置
-    const text = figma.createText()
-    text.x = pos.x
-    text.y = pos.y - 50
+      // グループのテキストを配置
+      const text = figma.createText()
+      text.x = pos.x
+      text.y = pos.y - 50
 
-    await figma.loadFontAsync(text.fontName as any)
-    text.characters = group.groupName
-    text.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }]
-    text.fontSize = 20
-  })
-
-  await Promise.all(promises)
+      await figma.loadFontAsync(text.fontName as any)
+      text.characters = group.groupName
+      text.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }]
+      text.fontSize = 20
+    }),
+  )
 }

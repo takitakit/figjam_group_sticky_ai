@@ -10,92 +10,104 @@ if (process.env.NODE_ENV === 'production') {
 
 figma.showUI(__html__, { width: 300, height: 380 })
 
-figma.ui.onmessage = msg => {
+figma.ui.onmessage = msg => handleUIMessage(msg)
+
+function handleUIMessage(msg: any) {
   console.log(`${msg.type} message received`)
 
-  if (msg.type === 'load-config') {
-    // Send config to UI
-    figma.clientStorage.getAsync('CONFIG').then(config => {
-      figma.ui.postMessage({
-        type: 'load-config-done',
-        data: config,
-      })
-    })
-  } else if (msg.type === 'save-config') {
-    // Save apikey to client storage
-    const config = msg.data
-    console.log('config', config)
-
-    figma.clientStorage.setAsync('CONFIG', config).then(() => {
-      figma.ui.postMessage({ type: 'save-config-done' })
-    })
-  } else if (msg.type === 'execute') {
-    main()
+  switch (msg.type) {
+    case 'load-config':
+      loadConfig()
+      break
+    case 'save-config':
+      saveConfig(msg.data)
+      break
+    case 'execute':
+      execute()
+      break
   }
 }
 
-function main() {
-  let CONFIG: Config
+async function execute() {
+  let CONFIG = await figma.clientStorage.getAsync('CONFIG')
   const stickyNodeMap: StickyNodeMap = {}
 
-  figma.clientStorage
-    .getAsync('CONFIG')
-    .then(config => {
-      if (!config?.apiKey) {
-        figma.ui.postMessage({
-          type: 'execute-error',
-          data: { message: 'API Key is not set' },
-        })
-        return
-      }
+  try {
+    validateConfig(CONFIG)
 
-      CONFIG = config
-    })
-    .then(() => {
-      // Check if sticky node is selected
-      const selectedNodes = figma.currentPage.selection.filter(
-        (node): node is StickyNode => node.type === 'STICKY',
-      )
-      console.log(`selectedNodes ${selectedNodes.length} stickies`)
-      if (selectedNodes.length < 3 || selectedNodes.length > 50) {
-        throw new PluginError(
-          'plugin.error.invalidSelection',
-          `selected: ${selectedNodes.length}`,
-        )
-      }
+    const ideaList = extractStickyNodeText(stickyNodeMap)
 
-      // Extract text of selected StickyNode with ID
-      return selectedNodes.map((node, index) => {
-        const id = index + 1
-        stickyNodeMap[id] = node
+    const groupedIdeas = await groupIdeas(ideaList, CONFIG)
 
-        let text = node.text.characters ?? ''
-        text = text.replace(/\n/g, ' ')
+    await rearrangeStickyNodes(stickyNodeMap, groupedIdeas)
 
-        return `${id}. ${text}`
-      })
+    figma.ui.postMessage({
+      type: 'execute-done',
+      data: { numberOfStickies: Object.keys(stickyNodeMap).length },
     })
-    .then(idea => {
-      return groupIdeas(idea, CONFIG)
-    })
-    .then(res => {
-      return rearrangeStickyNodes(stickyNodeMap, res)
-    })
-    .then(() => {
-      figma.ui.postMessage({
-        type: 'execute-done',
-        data: { numberOfStickies: Object.keys(stickyNodeMap).length },
-      })
-    })
-    .catch(err => {
-      console.log('err', err)
+  } catch (err) {
+    handleError(err)
+  }
+}
 
-      figma.ui.postMessage({
-        type: 'execute-error',
-        data: {
-          message: err.message,
-          originalError: err.originalError,
-        },
-      })
+// 設定値の読み込み
+function loadConfig() {
+  figma.clientStorage.getAsync('CONFIG').then(config => {
+    figma.ui.postMessage({
+      type: 'load-config-done',
+      data: config,
     })
+  })
+}
+
+// 設定値の保存
+function saveConfig(config: Config) {
+  console.log('config', config)
+  figma.clientStorage.setAsync('CONFIG', config).then(() => {
+    figma.ui.postMessage({ type: 'save-config-done' })
+  })
+}
+
+// 設定のバリデーション
+function validateConfig(config: Config | undefined) {
+  if (!config?.apiKey) {
+    throw new Error('plugin.error.apiKeyNotSet')
+  }
+}
+
+// 選択されたふせんのテキストを抽出
+function extractStickyNodeText(stickyNodeMap: StickyNodeMap): string[] {
+  const selectedNodes = figma.currentPage.selection.filter(
+    (node): node is StickyNode => node.type === 'STICKY',
+  )
+
+  // 選択されたふせんの数が不正
+  if (selectedNodes.length < 3 || selectedNodes.length > 50) {
+    throw new PluginError(
+      'plugin.error.invalidSelection',
+      `selected: ${selectedNodes.length}`,
+    )
+  }
+
+  // 選択されたふせんのテキストを抽出
+  return selectedNodes.map((node, index) => {
+    const id = index + 1
+    stickyNodeMap[id] = node
+
+    let text = node.text.characters ?? ''
+    return `${id}. ${text.replace(/\n/g, ' ')}`
+  })
+}
+
+// エラー処理
+function handleError(err: any) {
+  console.log('err', err)
+
+  figma.ui.postMessage({
+    type: 'execute-error',
+    data: {
+      message: err.message,
+      originalError: err.originalError,
+    },
+  })
 }

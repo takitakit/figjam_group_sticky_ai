@@ -3,16 +3,51 @@ import retryPromptTemplate from './retryPrompt'
 import { GroupedIdea, Config } from './default.d'
 import { PluginError } from './pluginError'
 
-// group ideas using ChatGPT
+// ChatGPTを使ってアイデアをグループ化する
 export async function groupIdeas(
   idea: string[],
   config: Config,
 ): Promise<GroupedIdea[]> {
-  console.log('groupIdeas')
+  // Promptの作成
+  const prompt = createPrompt(idea, config)
 
+  // ChatGPTによる応答の取得
+  const response = await getResponse(prompt, config)
+
+  // ChatGPTの応答からグループを抽出
+  let groups = parseGroups(response)
+
+  // グループから重複するIdeaIDsを削除
+  groups = removeDuplicatedIdeaIDs(groups)
+
+  // グループから漏れたIdeaIDsを抽出
+  const nonGroupedIDs = extractNonGroupedIdeaIDs(idea, groups)
+
+  // 漏れがあった場合に再度グルーピングを試みる
+  if (nonGroupedIDs.length > 0 && config.retryGrouping) {
+    groups = await retryGroupIdeas(idea, response, config)
+  }
+
+  // 選択されたIdeaの数がグループ化されたIdeaの数と一致しない場合にエラーをスロー
+  let resultNum = groups.reduce((acc, idea) => acc + idea.ideaIDs.length, 0)
+  if (idea.length !== resultNum && !config.forcedContinuation) {
+    throw new PluginError(
+      'plugin.error.discrepancyStickyNumber',
+      `selected: ${idea.length} result: ${resultNum}`,
+    )
+  }
+
+  return groups
+}
+
+// Promptの作成
+function createPrompt(idea: string[], config: Config): string {
   const prompt = promptTemplate[config.language] + idea.join('\n')
-  console.log('prompt', prompt)
+  return prompt
+}
 
+// ChatGPTによる応答の取得
+async function getResponse(prompt: string, config: Config): Promise<string> {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -35,50 +70,20 @@ export async function groupIdeas(
       stop: [' Human:', ' AI:'],
     }),
   })
-    .catch(error => {
-      throw new PluginError('plugin.error.apiRequestError', `${error.message}`)
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new PluginError(
-          'plugin.error.apiStatusError',
-          `${response.status}`,
-        )
-      }
-      return response
-    })
+
+  // エラーハンドリング
+  if (!response.ok) {
+    throw new PluginError('plugin.error.apiStatusError', `${response.status}`)
+  }
 
   const data = await response.json()
   const res = data.choices[0].message.content
 
-  console.log('response', res)
-
-  let groups = parseGroups(res)
-  groups = removeDuplicatedIdeaIDs(groups)
-
-  const nonGroupedIDs = extractNonGroupedIdeaIDs(idea, groups)
-  if (nonGroupedIDs.length > 0 && config.retryGrouping) {
-    // IDに漏れがある
-    // 漏れがあったアイデアについて、再度グルーピングを試みる
-    groups = await retryGroupIdeas(idea, res, config)
-  }
-
-  let resultNum = groups.reduce((acc, idea) => acc + idea.ideaIDs.length, 0)
-  if (idea.length !== resultNum && !config.forcedContinuation) {
-    // The number of selected stickies differs from the number of stickies in the analysis results.
-    throw new PluginError(
-      'plugin.error.discrepancyStickyNumber',
-      `selected: ${idea.length} result: ${resultNum}`,
-    )
-  }
-
-  return groups
+  return res
 }
 
-// ChatGPTの結果をパースする
+// ChatGPTの応答からグループを抽出
 function parseGroups(input: string): GroupedIdea[] {
-  console.log('parseGroups')
-
   if (input.trim().startsWith('Error')) {
     throw new Error('plugin.error.apiResponseParseError')
   }
@@ -112,26 +117,20 @@ function parseGroups(input: string): GroupedIdea[] {
   return groups
 }
 
-// remove duplicate IdeaIDs
+// グループから重複するIdeaIDsを削除
 function removeDuplicatedIdeaIDs(groups: GroupedIdea[]): GroupedIdea[] {
-  // Set to store IDs confirmed so far
   const seenIDs = new Set<string>()
-
-  // Create a new group array
   const newGroups: GroupedIdea[] = []
 
   for (const group of groups) {
-    // Filter for IDs in the current group that have not yet been confirmed
     const uniqueIDs = group.ideaIDs.filter(id => !seenIDs.has(id))
 
-    // If uniqueIDs is not empty, add as a new group
     if (uniqueIDs.length > 0) {
       newGroups.push({
         groupName: group.groupName,
         ideaIDs: uniqueIDs,
       })
 
-      // If uniqueIDs is not empty, add IDs contained in uniqueIDs as a new group to seenIDs
       uniqueIDs.forEach(id => seenIDs.add(id))
     }
   }
@@ -139,83 +138,37 @@ function removeDuplicatedIdeaIDs(groups: GroupedIdea[]): GroupedIdea[] {
   return newGroups
 }
 
-// グループから漏れたアイデアIDを抽出する
+// グループから漏れたIdeaIDsを抽出
 function extractNonGroupedIdeaIDs(
   ideas: string[],
   groupedIdeas: GroupedIdea[],
 ): string[] {
-  // まずはすべてのIDを取得
   const allIDs = ideas.map(idea => idea.split('.')[0].trim())
 
-  // グループ化されているIDを取得
   let groupedIDs: string[] = []
   for (let group of groupedIdeas) {
     groupedIDs = groupedIDs.concat(group.ideaIDs)
   }
 
-  // グループ化されていないIDをフィルタリング
   const nonGroupedIDs = allIDs.filter(id => !groupedIDs.includes(id))
 
   return nonGroupedIDs
 }
 
+// 漏れがあった場合に再度グルーピングを試みる
 async function retryGroupIdeas(
   idea: string[],
   groupedIdeas: string,
   config: Config,
 ): Promise<GroupedIdea[]> {
-  console.log('retryGroupIdeas')
-
   let prompt = retryPromptTemplate[config.language]
-  // アイデア入力を置き換える
   prompt = prompt.replace('{{INPUT_IDEAS}}', idea.join('\n'))
   prompt = prompt.replace('{{GROUPT_IDEAS}}', groupedIdeas)
-  console.log('prompt', prompt)
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${config.apiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      max_tokens: 1024,
-      temperature: 1,
-      top_p: 1,
-      frequency_penalty: 0.0,
-      presence_penalty: 0.6,
-      stop: [' Human:', ' AI:'],
-    }),
-  })
-    .catch(error => {
-      throw new PluginError('plugin.error.apiRequestError', `${error.message}`)
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new PluginError(
-          'plugin.error.apiStatusError',
-          `${response.status}`,
-        )
-      }
-      return response
-    })
+  const response = await getResponse(prompt, config)
 
-  const data = await response.json()
-  const res = data.choices[0].message.content
-
-  console.log('response', res)
-
-  let groups = parseGroups(res)
+  let groups = parseGroups(response)
   groups = removeDuplicatedIdeaIDs(groups)
-
-  console.log('groups', groupedIdeas)
 
   return groups
 }
