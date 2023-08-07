@@ -74,26 +74,6 @@ function main() {
       return groupIdeas(idea, CONFIG)
     })
     .then(res => {
-      console.log('CONFIG', CONFIG)
-      let resultNum = res.reduce((acc, idea) => acc + idea.ideaIDs.length, 0)
-      if (
-        Object.keys(stickyNodeMap).length !== resultNum &&
-        !CONFIG.forcedContinuation
-      ) {
-        const debug = []
-        res.map(idea => {
-          debug.push(...idea.ideaIDs)
-        })
-        console.log('debug', debug)
-
-        // The number of selected stickies differs from the number of stickies in the analysis results.
-        // throw new Error('plugin.error.discrepancyStickyNumber')
-        throw new PluginError(
-          'plugin.error.discrepancyStickyNumber',
-          `selected: ${Object.keys(stickyNodeMap).length} result: ${resultNum}`,
-        )
-      }
-
       return rearrangeStickyNodes(stickyNodeMap, res)
     })
     .then(() => {
