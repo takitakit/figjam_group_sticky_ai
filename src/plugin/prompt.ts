@@ -1,4 +1,5 @@
-const prompt_ja = `特定のテーマにおける議論で、参加者から出された複数のアイデアについて、似た内容持つものをグルーピングしてください。
+const prompt_ja: string = `
+特定のテーマにおける議論で、参加者から出された複数のアイデアについて、似た内容持つものをグルーピングしてください。
 一つずつのアイデアの先頭にはIDが付与されており、グルーピングの結果としては、観点とともに該当するアイデアのIDを列挙してください。
 結果は ## 結果フォーマット 内に記載のフォーマットに従ってください。
 結果に含まれるテキストは日本語で記載してください。
@@ -66,7 +67,8 @@ ideaIDs: 4,5
 ## アイデア入力
 `
 
-const prompt_en = `Please group multiple ideas that have similar perspectives that have been raised by the participants in a discussion on a particular topic.
+const prompt_en: string = `
+Please group multiple ideas that have similar perspectives that have been raised by the participants in a discussion on a particular topic.
 Each idea is prefixed with an ID, and the grouping result should list the ID of the corresponding idea along with the point of view.
 The results should follow the format described in ## Results Format.
 Text included in the results should be written in English.

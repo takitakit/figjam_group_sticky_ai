@@ -1,4 +1,4 @@
-const prompt_ja = `
+const prompt_ja: string = `
 あるテーマについて複数のメンバーで話し合ったアイデアリストがあり、これをグループ化してアイデアの内容が近いグループを作りました。
 具体例は ## グループ化されたアイデアの例 に掲載しています。
 
@@ -93,7 +93,7 @@ ideaIDs: 20
 {{GROUPT_IDEAS}}
 `
 
-const prompt_en = `
+const prompt_en: string = `
 We have a list of ideas discussed by several members on a certain topic, which were grouped to create groups with similar idea content.
 Specific examples can be found in ## Examples of grouped ideas.
 

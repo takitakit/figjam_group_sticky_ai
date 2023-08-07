@@ -1,7 +1,7 @@
 import promptTemplate from './prompt'
 import retryPromptTemplate from './retryPrompt'
 import { GroupedIdea, Config } from './default.d'
-import { PluginError } from './PluginError'
+import { PluginError } from './pluginError'
 
 // group ideas using ChatGPT
 export async function groupIdeas(

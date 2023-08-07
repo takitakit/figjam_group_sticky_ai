@@ -1,7 +1,7 @@
 import { StickyNodeMap, Config } from './default.d'
 import { groupIdeas } from './groupIdeas'
 import { rearrangeStickyNodes } from './rearrangeStickyNodes'
-import { PluginError } from './PluginError'
+import { PluginError } from './pluginError'
 
 figma.showUI(__html__, { width: 300, height: 330 })
 
