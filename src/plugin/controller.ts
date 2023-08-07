@@ -4,6 +4,9 @@ import { rearrangeStickyNodes } from './rearrangeStickyNodes'
 import { PluginError } from './pluginError'
 
 // figma.clientStorage.deleteAsync('CONFIG')
+if (process.env.NODE_ENV === 'production') {
+  console.log = function () {} // 何もしない関数に上書き
+}
 
 figma.showUI(__html__, { width: 300, height: 380 })
 
