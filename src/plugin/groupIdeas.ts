@@ -26,6 +26,7 @@ export async function groupIdeas(
   // 漏れがあった場合に再度グルーピングを試みる
   if (nonGroupedIDs.length > 0 && config.retryGrouping) {
     groups = await retryGroupIdeas(idea, response, config)
+    groups = removeDuplicatedIdeaIDs(groups)
   }
 
   // 選択されたIdeaの数がグループ化されたIdeaの数と一致しない場合にエラーをスロー
@@ -43,6 +44,7 @@ export async function groupIdeas(
 // Promptの作成
 function createPrompt(idea: string[], config: Config): string {
   const prompt = promptTemplate[config.language] + idea.join('\n')
+  console.log('prompt', prompt)
   return prompt
 }
 
@@ -79,26 +81,30 @@ async function getResponse(prompt: string, config: Config): Promise<string> {
   const data = await response.json()
   const res = data.choices[0].message.content
 
+  console.log('ChatGTP Response', res)
+
   return res
 }
 
 // ChatGPTの応答からグループを抽出
-function parseGroups(input: string): GroupedIdea[] {
+export function parseGroups(input: string): GroupedIdea[] {
   if (input.trim().startsWith('Error')) {
     throw new Error('plugin.error.apiResponseParseError')
   }
 
   const groups: GroupedIdea[] = []
   const lines = input.split('\n')
+  // console.log('lines', lines)
 
   let groupName = ''
   let ideaIDs: string[] = []
 
   for (let i = 0; i < lines.length; i++) {
-    if (lines[i].startsWith('group:')) {
-      groupName = lines[i].split(':')[1].trim()
-    } else if (lines[i].startsWith('ideaIDs:')) {
-      ideaIDs = lines[i]
+    const line = lines[i].trim()
+    if (line.startsWith('group:')) {
+      groupName = line.split(':')[1].trim()
+    } else if (line.startsWith('ideaIDs:')) {
+      ideaIDs = line
         .split(':')[1]
         .split(',')
         .map(id => id.trim())
@@ -118,7 +124,7 @@ function parseGroups(input: string): GroupedIdea[] {
 }
 
 // グループから重複するIdeaIDsを削除
-function removeDuplicatedIdeaIDs(groups: GroupedIdea[]): GroupedIdea[] {
+export function removeDuplicatedIdeaIDs(groups: GroupedIdea[]): GroupedIdea[] {
   const seenIDs = new Set<string>()
   const newGroups: GroupedIdea[] = []
 
@@ -139,7 +145,7 @@ function removeDuplicatedIdeaIDs(groups: GroupedIdea[]): GroupedIdea[] {
 }
 
 // グループから漏れたIdeaIDsを抽出
-function extractNonGroupedIdeaIDs(
+export function extractNonGroupedIdeaIDs(
   ideas: string[],
   groupedIdeas: GroupedIdea[],
 ): string[] {

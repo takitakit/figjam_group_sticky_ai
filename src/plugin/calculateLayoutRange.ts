@@ -16,7 +16,7 @@ export const calculateLayoutRange = (nodes: StickyNodeMap) => {
   // 各付箋に対して最小と最大の座標を確認し、必要に応じて更新
   for (let key in nodes) {
     let node = nodes[key]
-    console.log(`node[${key}] (x,y)=(${node.x},${node.y})`)
+    // console.log(`node[${key}] (x,y)=(${node.x},${node.y})`)
 
     if (node.x < minX) {
       minX = node.x
