@@ -16,4 +16,5 @@ export type Config = {
   apiKey: string
   forcedContinuation: boolean
   language: 'en' | 'ja'
+  retryGrouping: boolean
 }

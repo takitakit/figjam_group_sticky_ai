@@ -111,7 +111,7 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
 
       {!sharedObject.isLoadingConfig && (
         <>
-          <Stack direction="row" spacing={2} mt={5} justifyContent="center">
+          <Stack direction="row" spacing={2} mt={10} justifyContent="center">
             <Button variant="outlined" size="small" onClick={handleExecute}>
               {t('main.executeButton')}
             </Button>

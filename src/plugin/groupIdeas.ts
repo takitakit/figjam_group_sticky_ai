@@ -56,27 +56,20 @@ export async function groupIdeas(
   let groups = parseGroups(res)
   groups = removeDuplicatedIdeaIDs(groups)
 
+  const nonGroupedIDs = extractNonGroupedIdeaIDs(idea, groups)
+  if (nonGroupedIDs.length > 0 && config.retryGrouping) {
+    // IDに漏れがある
+    // 漏れがあったアイデアについて、再度グルーピングを試みる
+    groups = await retryGroupIdeas(idea, res, config)
+  }
+
   let resultNum = groups.reduce((acc, idea) => acc + idea.ideaIDs.length, 0)
   if (idea.length !== resultNum && !config.forcedContinuation) {
-    // if (true) {
-    const debug = []
-    groups.map(idea => {
-      debug.push(...idea.ideaIDs)
-    })
-    console.log('debug', debug)
-
     // The number of selected stickies differs from the number of stickies in the analysis results.
     throw new PluginError(
       'plugin.error.discrepancyStickyNumber',
       `selected: ${idea.length} result: ${resultNum}`,
     )
-  }
-
-  const nonGroupedIDs = extractNonGroupedIdeaIDs(idea, groups)
-  if (nonGroupedIDs.length > 0) {
-    // IDに漏れがある
-    // 漏れがあったアイデアについて、再度グルーピングを試みる
-    groups = await retryGroupIdeas(idea, res, config)
   }
 
   return groups

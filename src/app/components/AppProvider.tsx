@@ -4,6 +4,7 @@ interface Config {
   apiKey: string
   forcedContinuation: boolean
   language: 'en' | 'ja'
+  retryGrouping: boolean
 }
 
 interface SharedObject {
@@ -29,8 +30,9 @@ export const AppProvider: React.FC<ComponentProps> = ({ children }) => {
   const [sharedObject, setSharedObject] = React.useState<SharedObject>({
     config: {
       apiKey: '',
-      forcedContinuation: false,
+      forcedContinuation: true,
       language: 'en',
+      retryGrouping: false,
     },
     isAppExecuting: false,
     isLoadingConfig: true,

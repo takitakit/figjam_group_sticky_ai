@@ -8,6 +8,9 @@ export default {
       'Continue processing as much as possible even if results are incomplete',
     forcedContinuationTip:
       "Depending on the number of selected fusions (amount of text) and the content, ChatGPT's API send/receive limit may cause the text to be trunked or the results to be unstable. We will sort as much as possible even under those conditions.",
+    retryGroupingLabel: 'Re-grouping fusen that could not be grouped',
+    retryGroupingTip:
+      'In some cases, fusens are unintentionally excluded from the ChatGPT API response, in which case the grouping process is performed again. Regrouping extends the processing time because the API is requested again.',
     cancelButton: 'Cancel',
     saveButton: 'Save',
   },

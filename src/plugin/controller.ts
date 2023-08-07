@@ -3,7 +3,9 @@ import { groupIdeas } from './groupIdeas'
 import { rearrangeStickyNodes } from './rearrangeStickyNodes'
 import { PluginError } from './pluginError'
 
-figma.showUI(__html__, { width: 300, height: 330 })
+// figma.clientStorage.deleteAsync('CONFIG')
+
+figma.showUI(__html__, { width: 300, height: 380 })
 
 figma.ui.onmessage = msg => {
   console.log(`${msg.type} message received`)

@@ -22,32 +22,6 @@ interface Props {
 }
 
 export const Config: React.FC<Props> = ({ onClosed }) => {
-  // const textbox = React.useRef<HTMLInputElement>(undefined);
-
-  // const countRef = React.useCallback((element: HTMLInputElement) => {
-  //   if (element) element.value = '5';
-  //   textbox.current = element;
-  // }, []);
-
-  // const onCreate = () => {
-  //   const count = parseInt(textbox.current.value, 10);
-  //   parent.postMessage({ pluginMessage: { type: 'create-rectangles', count } }, '*');
-  // };
-
-  // const onCancel = () => {
-  //   parent.postMessage({ pluginMessage: { type: 'cancel' } }, '*');
-  // };
-
-  // React.useEffect(() => {
-  //   // This is how we read messages sent from the plugin controller
-  //   window.onmessage = (event) => {
-  //     const { type, message } = event.data.pluginMessage;
-  //     if (type === 'create-rectangles') {
-  //       console.log(`Figma Says: ${message}`);
-  //     }
-  //   };
-  // }, []);
-
   const { t } = useTranslation()
 
   const { sharedObject, setSharedObject } = React.useContext(AppContext)
@@ -56,6 +30,9 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
   )
   const [forcedContinuation, setForcedContinuation] = React.useState(
     sharedObject?.config?.forcedContinuation ?? true,
+  )
+  const [retryGrouping, setRetryGrouping] = React.useState(
+    sharedObject?.config?.retryGrouping ?? false,
   )
   const [language, setLanguage] = React.useState(
     sharedObject?.config?.language ?? 'en',
@@ -85,6 +62,11 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
   ) => {
     setForcedContinuation(event.target.checked)
   }
+  const handleRetryGroupingChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setRetryGrouping(event.target.checked)
+  }
   const handleLanguageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLanguage(event.target.value as 'en' | 'ja')
   }
@@ -102,11 +84,14 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
       forcedContinuation,
       'language',
       language,
+      'retryGrouping',
+      retryGrouping,
     )
     const newConfig = {
       apiKey: inputApiKey,
       forcedContinuation,
       language,
+      retryGrouping,
     }
     setSharedObject(prev => ({ ...prev, config: newConfig }))
 
@@ -157,6 +142,14 @@ export const Config: React.FC<Props> = ({ onClosed }) => {
             sx={{ ...formControlLabelStyle }}
             label={t('config.forcedContinuationLabel')}
             onChange={handleForcedContinuationChange}
+          />
+        </Tooltip>
+        <Tooltip title={t('config.retryGroupingTip')}>
+          <FormControlLabel
+            control={<Switch checked={retryGrouping} />}
+            sx={{ ...formControlLabelStyle }}
+            label={t('config.retryGroupingLabel')}
+            onChange={handleRetryGroupingChange}
           />
         </Tooltip>
       </Stack>

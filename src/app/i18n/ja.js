@@ -8,6 +8,9 @@ export default {
     forcedContinuationTip:
       '選択したふせんの数（テキスト量）や、内容によっては、ChatGPTのAPI送受信制限でテキストがトランクされていたり、結果が不安定になることがあります。その状態でもなるべく並び替えを行います。',
     cancelButton: 'キャンセル',
+    retryGroupingLabel: 'グループ化できなかったふせんを再度グループ化する',
+    retryGroupingTip:
+      '意図せずChatGPTのAPIレスポンス内からふせんが除外されてしまう場合があり、その場合に再度グループ化処理を行います。再グループするともう一度APIをリクエストするため処理時間が延長されます。',
     saveButton: '保存',
   },
   main: {
