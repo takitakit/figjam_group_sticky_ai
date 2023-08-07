@@ -7,10 +7,9 @@ import {
   IconButton,
   Stack,
   Alert,
+  Backdrop,
 } from '@mui/material'
 import SettingsIcon from '@mui/icons-material/Settings'
-import LoadingButton from '@mui/lab/LoadingButton'
-import SaveIcon from '@mui/icons-material/Save'
 import { useTranslation } from 'react-i18next'
 import i18n from 'i18next'
 
@@ -100,42 +99,31 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
     setSharedObject(prev => ({ ...prev, currentPage: 'config' }))
   }
 
+  const coffeeImg = require('../images/coffee.png').default
+
   return (
     <div>
-      <Box position="absolute" top="0" right="0">
-        <IconButton
-          onClick={handleConfigClick}
-          disabled={sharedObject.isAppExecuting}
-        >
-          <SettingsIcon />
-        </IconButton>
-      </Box>
       {sharedObject.isLoadingConfig && (
         <Stack justifyContent="center" alignItems="center">
           <CircularProgress />
         </Stack>
       )}
-      <Stack direction="row" spacing={2} mt={5} justifyContent="center">
-        {!sharedObject.isLoadingConfig && (
-          <>
-            {sharedObject.isAppExecuting ? (
-              <LoadingButton
-                size="small"
-                loading
-                loadingPosition="start"
-                variant="outlined"
-                startIcon={<SaveIcon />}
-              >
-                {t('main.executeButton')}
-              </LoadingButton>
-            ) : (
-              <Button variant="outlined" size="small" onClick={handleExecute}>
-                {t('main.executeButton')}
-              </Button>
-            )}
-          </>
-        )}
-      </Stack>
+
+      {!sharedObject.isLoadingConfig && (
+        <>
+          <Stack direction="row" spacing={2} mt={5} justifyContent="center">
+            <Button variant="outlined" size="small" onClick={handleExecute}>
+              {t('main.executeButton')}
+            </Button>
+          </Stack>
+          <Box position="absolute" top="0" right="0">
+            <IconButton onClick={handleConfigClick}>
+              <SettingsIcon />
+            </IconButton>
+          </Box>
+        </>
+      )}
+
       {sharedObject.executeError && (
         <Stack mt={2} spacing={2}>
           <Alert severity="error">{sharedObject.executeError}</Alert>
@@ -150,6 +138,23 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
           </Alert>
         </Stack>
       )}
+
+      <Backdrop
+        sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
+        open={sharedObject.isAppExecuting}
+      >
+        <img
+          src={coffeeImg}
+          alt="coffee"
+          width={24}
+          style={{
+            position: 'absolute',
+            top: 'calc(50% - 14px)',
+            left: 'calc(50% - 12px)',
+          }}
+        />
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </div>
   )
 }
