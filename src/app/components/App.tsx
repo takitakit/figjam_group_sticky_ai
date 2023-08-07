@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === 'production') {
   console.log = function () {} // 何もしない関数に上書き
 }
 
-function App() {
+const App = () => {
   return (
     <>
       <AppProvider>
@@ -18,5 +18,4 @@ function App() {
     </>
   )
 }
-
 export default App

@@ -1,13 +1,12 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import '../styles/global.scss'
 
 import { AppContext } from './AppProvider'
-import { Config } from './Config'
+import { Configure } from './Configure'
 import { Main } from './Main'
 
 export const AppContainer: React.FC = () => {
-  const context = React.useContext(AppContext)
-  const { sharedObject, setSharedObject } = context
+  const { sharedObject, setSharedObject } = useContext(AppContext)
 
   const handleConfigClosed = () => {
     setSharedObject(prev => ({ ...prev, currentPage: 'main' }))
@@ -15,7 +14,6 @@ export const AppContainer: React.FC = () => {
 
   const handleEmptyConfig = () => {
     console.log('empty config detected')
-    // if config is empty, open config
     setSharedObject(prev => ({ ...prev, currentPage: 'config' }))
   }
 
@@ -25,7 +23,7 @@ export const AppContainer: React.FC = () => {
         <Main onEmptyConfig={handleEmptyConfig} />
       )}
       {sharedObject.currentPage === 'config' && (
-        <Config onClosed={handleConfigClosed} />
+        <Configure onClosed={handleConfigClosed} />
       )}
     </>
   )

@@ -1,4 +1,4 @@
-import { StickyNodeMap, Config } from './default.d'
+import { StickyNodeMap, Config } from '../type/default'
 import { groupIdeas } from './groupIdeas'
 import { rearrangeStickyNodes } from './rearrangeStickyNodes'
 import { PluginError } from './pluginError'

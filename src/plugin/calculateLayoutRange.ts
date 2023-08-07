@@ -1,4 +1,4 @@
-import { StickyNodeMap } from './default.d'
+import { StickyNodeMap } from '../type/default'
 
 export const calculateLayoutRange = (nodes: StickyNodeMap) => {
   console.log('calculateLayoutRange')

@@ -1,4 +1,4 @@
-import { StickyNodeMap, GroupedIdea } from './default.d'
+import { StickyNodeMap, GroupedIdea } from '../type/default'
 import { calculateLayoutRange } from './calculateLayoutRange'
 
 // 付箋をグループごとに再配置する

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { createContext, useState } from 'react'
 
 interface Config {
   apiKey: string
@@ -15,7 +15,7 @@ interface SharedObject {
   currentPage: 'main' | 'config'
 }
 
-interface ComponentProps {
+interface Props {
   children?: React.ReactNode
 }
 
@@ -24,13 +24,13 @@ interface Context {
   setSharedObject: React.Dispatch<React.SetStateAction<SharedObject>>
 }
 
-export const AppContext = React.createContext<Context | undefined>(undefined)
+export const AppContext = createContext<Context | undefined>(undefined)
 
-export const AppProvider: React.FC<ComponentProps> = ({ children }) => {
-  const [sharedObject, setSharedObject] = React.useState<SharedObject>({
+export const AppProvider: React.FC<Props> = ({ children }) => {
+  const [sharedObject, setSharedObject] = useState<SharedObject>({
     config: {
       apiKey: '',
-      forcedContinuation: true,
+      forcedContinuation: false,
       language: 'en',
       retryGrouping: false,
     },

@@ -1,6 +1,6 @@
 import promptTemplate from './prompt'
 import retryPromptTemplate from './retryPrompt'
-import { GroupedIdea, Config } from './default.d'
+import { GroupedIdea, Config } from '../type/default'
 import { PluginError } from './pluginError'
 
 // ChatGPTを使ってアイデアをグループ化する

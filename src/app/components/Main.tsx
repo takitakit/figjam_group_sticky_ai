@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { AppContext } from './AppProvider'
 import {
   Box,
@@ -17,75 +17,73 @@ interface Props {
   onEmptyConfig: () => void
 }
 
-interface result {
+interface Result {
   numberOfStickies: number
 }
 
 export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
-  const context = React.useContext(AppContext)
-  const { sharedObject, setSharedObject } = context
-  const [result, setResult] = React.useState<result | null>(null)
-
+  const { sharedObject, setSharedObject } = useContext(AppContext)
+  const { isLoadingConfig, executeError, isAppExecuting } = sharedObject
+  const [result, setResult] = useState<Result | null>(null)
   const { t } = useTranslation()
 
-  React.useEffect(() => {
-    console.log('main mounted')
-
-    // Loading config from plugin
-    parent.postMessage({ pluginMessage: { type: 'load-config' } }, '*')
-
-    window.onmessage = (event: MessageEvent) => {
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
       const { type, data } = event.data.pluginMessage
-      console.log(`${type} message received`)
+      console.log(`${type} message: received`)
 
-      if (type === 'load-config-done') {
-        // save config to context
-        console.log('config', data)
-
-        setSharedObject(prev => ({
-          ...prev,
-          config: data,
-          isLoadingConfig: false,
-        }))
-
-        i18n.changeLanguage(data?.language || 'en')
-
-        if (!data?.apiKey) {
-          // if apiKey is not set, open config
-          onEmptyConfig()
-        }
-      } else if (type === 'execute-error') {
-        // detect error
-        console.log('data', data)
-        let message = t(data.message)
-        if (data.originalError) {
-          message = `${message} ${data.originalError}`
-        }
-
-        setResult(null)
-        setSharedObject(prev => ({
-          ...prev,
-          isAppExecuting: false,
-          executeError: message,
-        }))
-      } else if (type === 'execute-done') {
-        // detect success
-        setResult(data)
-        setSharedObject(prev => ({
-          ...prev,
-          isAppExecuting: false,
-          executeError: '',
-        }))
+      switch (type) {
+        case 'load-config-done':
+          handleConfigLoaded(data)
+          break
+        case 'execute-error':
+          handleExecutionError(data)
+          break
+        case 'execute-done':
+          handleExecutionSuccess(data)
+          break
       }
     }
 
-    return () => {
-      window.onmessage = null
-    }
+    window.addEventListener('message', handleMessage)
+    parent.postMessage({ pluginMessage: { type: 'load-config' } }, '*')
+    return () => window.removeEventListener('message', handleMessage)
   }, [])
 
+  const handleConfigLoaded = (data: any) => {
+    setSharedObject(prev => ({
+      ...prev,
+      config: data,
+      isLoadingConfig: false,
+    }))
+    i18n.changeLanguage(data?.language || 'en')
+    if (!data?.apiKey) {
+      onEmptyConfig()
+    }
+  }
+
+  const handleExecutionError = (data: any) => {
+    const errorMessage = data.originalError
+      ? `${t(data.message)} ${data.originalError}`
+      : t(data.message)
+    setResult(null)
+    setSharedObject(prev => ({
+      ...prev,
+      isAppExecuting: false,
+      executeError: errorMessage,
+    }))
+  }
+
+  const handleExecutionSuccess = (data: any) => {
+    setResult(data)
+    setSharedObject(prev => ({
+      ...prev,
+      isAppExecuting: false,
+      executeError: '',
+    }))
+  }
+
   const handleExecute = () => {
-    // do group selected stickies
     setResult(null)
     setSharedObject(prev => ({
       ...prev,
@@ -102,14 +100,12 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
   const coffeeImg = require('../images/coffee.png').default
 
   return (
-    <div>
-      {sharedObject.isLoadingConfig && (
+    <>
+      {isLoadingConfig ? (
         <Stack justifyContent="center" alignItems="center">
           <CircularProgress />
         </Stack>
-      )}
-
-      {!sharedObject.isLoadingConfig && (
+      ) : (
         <>
           <Stack direction="row" spacing={2} mt={10} justifyContent="center">
             <Button variant="outlined" size="small" onClick={handleExecute}>
@@ -124,13 +120,14 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
         </>
       )}
 
-      {sharedObject.executeError && (
-        <Stack mt={2} spacing={2}>
-          <Alert severity="error">{sharedObject.executeError}</Alert>
+      {executeError && (
+        <Stack mt={2}>
+          <Alert severity="error">{executeError}</Alert>
         </Stack>
       )}
+
       {result && (
-        <Stack mt={2} spacing={2}>
+        <Stack mt={2}>
           <Alert severity="success">
             {t('main.executeResult', {
               numOfStickies: result.numberOfStickies,
@@ -141,7 +138,7 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
 
       <Backdrop
         sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
-        open={sharedObject.isAppExecuting}
+        open={isAppExecuting}
       >
         <img
           src={coffeeImg}
@@ -149,12 +146,13 @@ export const Main: React.FC<Props> = ({ onEmptyConfig }) => {
           width={24}
           style={{
             position: 'absolute',
-            top: 'calc(50% - 14px)',
-            left: 'calc(50% - 12px)',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
           }}
         />
         <CircularProgress color="inherit" />
       </Backdrop>
-    </div>
+    </>
   )
 }
