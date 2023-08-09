@@ -19,7 +19,7 @@ export default {
   },
   plugin: {
     error: {
-      invalidSelection: '3枚以上、100枚以下のふせんを選択する必要があります',
+      invalidSelection: '3枚以上、50枚以下のふせんを選択する必要があります',
       discrepancyStickyNumber:
         '選択されたふせんの数と、解析結果のふせんの数が異なります。解析結果に問題があります。',
       apiStatusError: 'APIレスポンスに問題がありました。 status:',

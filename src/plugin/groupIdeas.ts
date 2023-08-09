@@ -1,6 +1,9 @@
-import promptTemplate from './prompt'
-import retryPromptTemplate from './retryPrompt'
-import { GroupedIdea, Config } from '../type/default'
+import systemPrompt from './prompt/system'
+import examplePrompt from './prompt/example'
+import retryPrompt from './prompt/retry'
+
+// import retryPromptTemplate from './retryPrompt'
+import { GroupedIdea, Config, ChatGTPPrompt } from '../type/default'
 import { PluginError } from './pluginError'
 
 // ChatGPTを使ってアイデアをグループ化する
@@ -21,12 +24,29 @@ export async function groupIdeas(
   groups = removeDuplicatedIdeaIDs(groups)
 
   // グループから漏れたIdeaIDsを抽出
-  const nonGroupedIDs = extractNonGroupedIdeaIDs(idea, groups)
+  const nonGroupedIdeas = extractNonGroupedIdeas(idea, groups)
 
   // 漏れがあった場合に再度グルーピングを試みる
-  if (nonGroupedIDs.length > 0 && config.retryGrouping) {
-    groups = await retryGroupIdeas(idea, response, config)
+  if (nonGroupedIdeas.length > 0 && config.retryGrouping) {
+    console.log('retry grouping... nonGroupedIdeas:', nonGroupedIdeas.length)
+    // Retry用のPromptの作成
+    const retryPrompt = createRetryPrompt(
+      nonGroupedIdeas,
+      prompt,
+      response,
+      config,
+    )
+
+    // ChatGPTによる応答の取得
+    const retryResponse = await getResponse(retryPrompt, config)
+
+    // ChatGPTの応答からグループを抽出
+    groups = parseGroups(retryResponse)
+
     groups = removeDuplicatedIdeaIDs(groups)
+
+    const retryNonGroupedIdeas = extractNonGroupedIdeas(idea, groups)
+    console.log('retryNonGroupedIdeas', retryNonGroupedIdeas)
   }
 
   // 選択されたIdeaの数がグループ化されたIdeaの数と一致しない場合にエラーをスロー
@@ -42,14 +62,47 @@ export async function groupIdeas(
 }
 
 // Promptの作成
-function createPrompt(idea: string[], config: Config): string {
-  const prompt = promptTemplate[config.language] + idea.join('\n')
+function createPrompt(idea: string[], config: Config): ChatGTPPrompt[] {
+  const prompt = []
+
+  prompt.push(systemPrompt[config.language])
+  prompt.push(...examplePrompt[config.language])
+  prompt.push({
+    role: 'user',
+    content: idea.join('\n'),
+  })
   console.log('prompt', prompt)
+
+  return prompt
+}
+
+function createRetryPrompt(
+  idea: string[],
+  prevPrompt: ChatGTPPrompt[],
+  prevResponse: string,
+  config: Config,
+): ChatGTPPrompt[] {
+  const prompt = [...prevPrompt]
+  const retry = { ...(retryPrompt[config.language] as ChatGTPPrompt) }
+  retry['content'] = retry['content'].replace('{{IDEAS}}', idea.join('\n'))
+  retry['content'] = retry['content'].replace('{{PREV_OUTPUT}}', prevResponse)
+
+  prompt.push({
+    role: 'assistant',
+    content: prevResponse,
+  })
+  prompt.push(retry)
+
+  console.log('prompt', prompt)
+
   return prompt
 }
 
 // ChatGPTによる応答の取得
-async function getResponse(prompt: string, config: Config): Promise<string> {
+async function getResponse(
+  prompt: ChatGTPPrompt[],
+  config: Config,
+): Promise<string> {
   const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -58,12 +111,7 @@ async function getResponse(prompt: string, config: Config): Promise<string> {
     },
     body: JSON.stringify({
       model: 'gpt-4',
-      messages: [
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
+      messages: prompt,
       max_tokens: 1024,
       temperature: 1,
       top_p: 1,
@@ -145,36 +193,36 @@ export function removeDuplicatedIdeaIDs(groups: GroupedIdea[]): GroupedIdea[] {
 }
 
 // グループから漏れたIdeaIDsを抽出
-export function extractNonGroupedIdeaIDs(
+export function extractNonGroupedIdeas(
   ideas: string[],
   groupedIdeas: GroupedIdea[],
 ): string[] {
-  const allIDs = ideas.map(idea => idea.split('.')[0].trim())
+  // const allIDs = ideas.map(idea => idea.split('.')[0].trim())
 
   let groupedIDs: string[] = []
   for (let group of groupedIdeas) {
     groupedIDs = groupedIDs.concat(group.ideaIDs)
   }
 
-  const nonGroupedIDs = allIDs.filter(id => !groupedIDs.includes(id))
+  return ideas.filter(idea => !groupedIDs.includes(idea.split('.')[0].trim()))
 
-  return nonGroupedIDs
+  // const nonGroupedIDs = allIDs.filter(id => !groupedIDs.includes(id))
+
+  // return nonGroupedIDs
 }
 
 // 漏れがあった場合に再度グルーピングを試みる
-async function retryGroupIdeas(
-  idea: string[],
-  groupedIdeas: string,
-  config: Config,
-): Promise<GroupedIdea[]> {
-  let prompt = retryPromptTemplate[config.language]
-  prompt = prompt.replace('{{INPUT_IDEAS}}', idea.join('\n'))
-  prompt = prompt.replace('{{GROUPT_IDEAS}}', groupedIdeas)
+// async function retryGroupIdeas(
+//   idea: string[],
+//   prevPrompt: ChatGTPPrompt[],
+//   config: Config,
+// ): Promise<GroupedIdea[]> {
+//   const prompt = createRetryPrompt(idea, prevPrompt, config)
 
-  const response = await getResponse(prompt, config)
+//   const response = await getResponse(prompt, config)
 
-  let groups = parseGroups(response)
-  groups = removeDuplicatedIdeaIDs(groups)
+//   let groups = parseGroups(response)
+//   groups = removeDuplicatedIdeaIDs(groups)
 
-  return groups
-}
+//   return groups
+// }

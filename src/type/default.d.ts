@@ -18,3 +18,8 @@ export type Config = {
   language: 'en' | 'ja'
   retryGrouping: boolean
 }
+
+export type ChatGTPPrompt = {
+  role: 'system' | 'assistant' | 'user'
+  content: string
+}

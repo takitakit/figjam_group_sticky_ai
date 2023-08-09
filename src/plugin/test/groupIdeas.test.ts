@@ -1,7 +1,7 @@
 import {
   parseGroups,
   removeDuplicatedIdeaIDs,
-  extractNonGroupedIdeaIDs,
+  extractNonGroupedIdeas,
 } from '../groupIdeas'
 import { GroupedIdea } from '../../type/default'
 
@@ -140,12 +140,12 @@ test('グループデータから非グループ化されたIdeaIDsを抽出で�
     '11. idea',
   ]
 
-  expect(extractNonGroupedIdeaIDs(ideaList, groups)).toEqual([
-    '6',
-    '4',
-    '7',
-    '8',
-    '9',
-    '11',
+  expect(extractNonGroupedIdeas(ideaList, groups)).toEqual([
+    '6. idea',
+    '4. idea',
+    '7. idea',
+    '8. idea',
+    '9. idea',
+    '11. idea',
   ])
 })

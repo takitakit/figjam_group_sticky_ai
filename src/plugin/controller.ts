@@ -78,7 +78,8 @@ function validateConfig(config: Config | undefined) {
 // 選択されたふせんのテキストを抽出
 function extractStickyNodeText(stickyNodeMap: StickyNodeMap): string[] {
   const selectedNodes = figma.currentPage.selection.filter(
-    (node): node is StickyNode => node.type === 'STICKY',
+    (node): node is StickyNode =>
+      node.type === 'STICKY' && node.text.characters.trim() !== '',
   )
 
   // 選択されたふせんの数が不正
