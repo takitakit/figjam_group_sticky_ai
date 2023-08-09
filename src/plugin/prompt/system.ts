@@ -10,7 +10,7 @@ const prompt_ja: ChatGTPPrompt = {
 
 結果に含まれるテキストは日本語で記載してください。
 結果に含むアイデアIDはにカンマ区切りで記述し、全て一行で記載してください。
-ただし、必ずユーザが記載したアイデアのIDがすべて結果の中に含まれ、かつ数が一致するようにしてください。IDの重複は許可しません。
+ただし、必ずユーザが記載したアイデアのIDがすべて結果の中に含まれ、かつ入力したアイデアと数が一致するようにしてください。IDの重複は許可しません。
 
 類似点が多いものをまとめて見やすくするためなので、類似点が少ない場合は無理にグルーピングしないでください。
 グルーピングが難しく、結果フォーマットに従って出力ができない場合は、「Error:」という文字列の後にエラーの内容を記載してください。
@@ -30,8 +30,9 @@ You are asked to group ideas that are similar in content from participants in a 
 Each idea listed by the user is prefixed with an ID, and you should list the ID of the corresponding idea along with the point of view.
 Results should follow the format described in [Result format]. No other text output is allowed.
 
-Text included in the results must be written in English.
-Idea IDs included in the results should be separated by commas, and all IDs should be written on a single line.
+Text included in the results should be written in English.
+Idea IDs included in the results should be separated by commas and all should be on a single line.
+However, please make sure that all idea IDs entered by the user are included in the results and that the number of IDs matches the number of ideas entered.
 Duplicate IDs are not permitted.
 
 If there are only a few similarities, please do not force grouping.
