@@ -5,8 +5,9 @@ const prompt_ja: ChatGTPPrompt = {
   content: `
 いくつかのアイデアが結果に含まれていないようです。
 含まれていないアイデアを入力するので、もう一度グループ化を試みてください。
-結果は、[ベースの出力]を参照して、内容が近しい場合は既存のグループにIDを追加してください。
+結果は、[ベースの出力]を参照して、groupに書かれている内容に近い場合は既存のグループにIDを追加してください。
 内容が近しいグループがない場合は、新しいグループを作成してください。
+結果に含まれるgroup、ideaIDsは、[ベースの出力]に記載された内容を必ず含むはずです。
 
 ただし出力結果は 結果フォーマット に従います。それ以外の出力は一切禁止します。謝罪も不要です。
 
@@ -32,6 +33,7 @@ It appears that some ideas are not included in the results.
 Enter the ideas that are not included, so try grouping them again.
 Refer to the [Base Output] for the results and add the ID to the existing group if the content is close.
 If there is no group with similar content, create a new group.
+The group and ideaIDs in the results should always include what is listed in the [Base Output].
 
 However, the output will follow the result format. Any other output is prohibited. No apologies are required.
 

@@ -25,10 +25,11 @@ export async function groupIdeas(
 
   // グループから漏れたIdeaIDsを抽出
   const nonGroupedIdeas = extractNonGroupedIdeas(idea, groups)
+  console.log('nonGroupedIdeas:', nonGroupedIdeas.length)
 
   // 漏れがあった場合に再度グルーピングを試みる
   if (nonGroupedIdeas.length > 0 && config.retryGrouping) {
-    console.log('retry grouping... nonGroupedIdeas:', nonGroupedIdeas.length)
+    console.log('retry grouping')
     // Retry用のPromptの作成
     const retryPrompt = createRetryPrompt(
       nonGroupedIdeas,
