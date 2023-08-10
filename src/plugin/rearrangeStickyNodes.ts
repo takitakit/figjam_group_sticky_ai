@@ -57,20 +57,27 @@ export async function rearrangeStickyNodes(
     currentPos.x = maxX + marginBetweenGroups
   })
 
+  await loadFont()
+
   // グループ単位のグループ名テキストを配置
-  await Promise.all(
-    groupedIdeas.map(async (group, index) => {
-      const pos = groupPosMap[index]
+  groupedIdeas.map(async (group, index) => {
+    const pos = groupPosMap[index]
 
-      // グループのテキストを配置
-      const text = figma.createText()
-      text.x = pos.x
-      text.y = pos.y - 50
+    // グループのテキストを配置
+    const text = figma.createText()
+    text.x = pos.x
+    text.y = pos.y - 50
 
-      await figma.loadFontAsync(text.fontName as any)
-      text.characters = group.groupName
-      text.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }]
-      text.fontSize = 20
-    }),
-  )
+    console.info('text font', text.fontName)
+
+    text.characters = group.groupName
+    text.fills = [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }]
+    text.fontSize = 20
+  })
+}
+
+async function loadFont() {
+  const text = figma.createText()
+  console.info('loadFont', text.fontName, text.fontSize)
+  await figma.loadFontAsync(text.fontName as any)
 }
